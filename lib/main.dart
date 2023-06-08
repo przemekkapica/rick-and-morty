@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:rick_and_morty/core/di/di_config.dart';
 import 'package:rick_and_morty/presentation/app/app.dart';
 
 void main() {
+  configureDependencies();
   runApp(const MyApp());
 }
 
