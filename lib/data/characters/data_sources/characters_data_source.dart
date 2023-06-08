@@ -12,5 +12,11 @@ abstract class CharactersDataSource {
   factory CharactersDataSource(Dio dio) = _CharactersDataSource;
 
   @GET('/character')
-  Future<GetCharactersDTO> getCharacters();
+  Future<GetCharactersDTO> getCharacters(
+    @Query('page') int page,
+    @Query('name') String? name,
+    @Query('status') String? status,
+    @Query('species') String? species,
+    @Query('gender') String? gender,
+  );
 }

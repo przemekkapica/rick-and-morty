@@ -1,6 +1,7 @@
 import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
+import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
 import 'package:rick_and_morty/domain/use_cases/get_characters.dart';
 
 part 'characters_list_store.g.dart';
@@ -26,14 +27,27 @@ abstract class _CharactersListStore with Store {
   @observable
   ObservableFuture<Characters> _charactersFuture = ObservableFuture.value([]);
 
+  @observable
+  CharactersFilter filter = const CharactersFilter();
+
+  @observable
+  int pageNumnber = 1;
+
   @action
-  Future<void> fetchCharacters() async {
+  Future<Characters> fetchCharacters(
+      int pageNumber, CharactersFilter? filter) async {
     try {
-      _charactersFuture = ObservableFuture(_getCharacters());
+      _charactersFuture = ObservableFuture(
+        _getCharacters(pageNumnber, filter ?? CharactersFilter()),
+      );
+
       _characters = await _charactersFuture;
+      return _characters;
     } catch (e) {
       print(e);
     }
+
+    return [];
   }
 
   @computed
