@@ -8,6 +8,7 @@ class BaseDio extends DioMixin {
   }
 
   void _initialize() {
+    httpClientAdapter = HttpClientAdapter();
     options = BaseOptions(
       baseUrl: EnvConfig.apiBaseUrl,
       receiveTimeout: const Duration(seconds: 10),

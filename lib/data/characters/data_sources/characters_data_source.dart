@@ -11,6 +11,6 @@ abstract class CharactersDataSource {
   @factoryMethod
   factory CharactersDataSource(Dio dio) = _CharactersDataSource;
 
-  @GET('/characters')
+  @GET('/character')
   Future<GetCharactersDTO> getCharacters();
 }

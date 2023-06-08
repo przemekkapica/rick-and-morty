@@ -16,6 +16,6 @@ class GetCharactersInfoDTO {
 
   final int count;
   final int pages;
-  final String next;
-  final String prev;
+  final String? next;
+  final String? prev;
 }
