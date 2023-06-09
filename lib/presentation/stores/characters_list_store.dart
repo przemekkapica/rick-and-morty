@@ -2,6 +2,8 @@ import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
+import 'package:rick_and_morty/domain/characters/model/characters_page.f.dart';
+import 'package:rick_and_morty/domain/pagination/model/pagination_info.f.dart';
 import 'package:rick_and_morty/domain/use_cases/get_characters.dart';
 
 part 'characters_list_store.g.dart';
@@ -25,29 +27,67 @@ abstract class _CharactersListStore with Store {
   Characters characters = [];
 
   @observable
-  ObservableFuture<Characters> _charactersFuture = ObservableFuture.value([]);
+  PaginationInfo paginationInfo = PaginationInfo(
+    currentPage: 1,
+    totalPages: 1,
+    hasPrevious: false,
+    hasNext: true,
+  );
+
+  @observable
+  ObservableFuture<CharactersPage> _charactersPageFuture =
+      ObservableFuture.value(
+    CharactersPage(
+      characters: [],
+      paginationInfo: PaginationInfo(
+        currentPage: 1,
+        totalPages: 1,
+        hasPrevious: false,
+        hasNext: true,
+      ),
+    ),
+  );
 
   @action
   Future<void> fetchCharacters(
+    int? pageNumber,
+    int? pageModifier,
     CharactersFilter? filter,
   ) async {
     try {
-      _charactersFuture = ObservableFuture(
-        _getCharacters(null, filter ?? const CharactersFilter()),
-      );
+      if (pageNumber != null) {
+        _asignCharactersPageFuture(pageNumber, filter);
+      } else {
+        _asignCharactersPageFuture(
+          paginationInfo.currentPage + (pageModifier ?? 0),
+          filter,
+        );
+      }
 
-      characters = await _charactersFuture;
+      final response = await _charactersPageFuture;
+
+      characters = response.characters;
+      paginationInfo = response.paginationInfo;
     } catch (e) {
       print(e);
     }
   }
 
+  void _asignCharactersPageFuture(int pageNumber, CharactersFilter? filter) {
+    _charactersPageFuture = ObservableFuture(
+      _getCharacters(
+        pageNumber,
+        filter ?? const CharactersFilter(),
+      ),
+    );
+  }
+
   @computed
   CharactersListState get state {
-    if (_charactersFuture.value == []) {
+    if (_charactersPageFuture.value == []) {
       return CharactersListState.empty;
     }
-    switch (_charactersFuture.status) {
+    switch (_charactersPageFuture.status) {
       case FutureStatus.pending:
         return CharactersListState.loading;
       case FutureStatus.fulfilled:

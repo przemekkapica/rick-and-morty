@@ -87,8 +87,11 @@ class FilterCharactersBottomSheet extends StatelessWidget {
               child: ElevatedButton(
                 child: const Text('Filter'),
                 onPressed: () {
-                  charactersListStore
-                      .fetchCharacters(filterCharactersStore.filter);
+                  charactersListStore.fetchCharacters(
+                    1,
+                    null,
+                    filterCharactersStore.filter,
+                  );
                   Navigator.of(context).pop();
                 },
               ),

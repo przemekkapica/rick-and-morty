@@ -1,18 +1,18 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
-part 'get_characters_info_dto.g.dart';
+part 'pagination_info_dto.g.dart';
 
 @JsonSerializable()
-class GetCharactersInfoDTO {
-  GetCharactersInfoDTO({
+class PaginationInfoDTO {
+  PaginationInfoDTO({
     required this.count,
     required this.pages,
     required this.next,
     required this.prev,
   });
 
-  factory GetCharactersInfoDTO.fromJson(Map<String, dynamic> json) =>
-      _$GetCharactersInfoDTOFromJson(json);
+  factory PaginationInfoDTO.fromJson(Map<String, dynamic> json) =>
+      _$PaginationInfoDTOFromJson(json);
 
   final int count;
   final int pages;

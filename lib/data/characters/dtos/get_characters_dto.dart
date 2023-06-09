@@ -1,6 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:rick_and_morty/data/characters/dtos/character_dto.dart';
-import 'package:rick_and_morty/data/characters/dtos/get_characters_info_dto.dart';
+import 'package:rick_and_morty/data/pagination/dtos/pagination_info_dto.dart';
 
 part 'get_characters_dto.g.dart';
 
@@ -14,6 +14,6 @@ class GetCharactersDTO {
   factory GetCharactersDTO.fromJson(Map<String, dynamic> json) =>
       _$GetCharactersDTOFromJson(json);
 
-  final GetCharactersInfoDTO info;
+  final PaginationInfoDTO info;
   final List<CharacterDTO> results;
 }

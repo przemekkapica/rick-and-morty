@@ -10,6 +10,8 @@ import 'package:rick_and_morty/presentation/router/go_router.dart';
 import 'package:rick_and_morty/presentation/stores/characters_list_store.dart';
 import 'package:rick_and_morty/presentation/stores/filter_characters_store.dart';
 
+import 'widgets/paginator.dart';
+
 class CharactersListPage extends StatefulWidget {
   const CharactersListPage({super.key});
 
@@ -18,15 +20,15 @@ class CharactersListPage extends StatefulWidget {
 }
 
 class _CharactersListPageState extends State<CharactersListPage> {
-  final CharactersListStore _charactersListStore = getIt<CharactersListStore>();
-  final FilterCharactersStore _filterCharactersStore =
+  final CharactersListStore charactersListStore = getIt<CharactersListStore>();
+  final FilterCharactersStore filterCharactersStore =
       getIt<FilterCharactersStore>();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    _charactersListStore.fetchCharacters(null);
+    charactersListStore.fetchCharacters(null, null, null);
   }
 
   @override
@@ -44,20 +46,22 @@ class _CharactersListPageState extends State<CharactersListPage> {
         backgroundColor: Theme.of(context).primaryColor,
       ),
       floatingActionButton: _FloatingActionButton(
-        charactersListStore: _charactersListStore,
-        filterCharactersStore: _filterCharactersStore,
+        charactersListStore: charactersListStore,
+        filterCharactersStore: filterCharactersStore,
       ),
       body: Center(
         child: Observer(
           builder: (context) {
-            switch (_charactersListStore.state) {
+            switch (charactersListStore.state) {
               case CharactersListState.empty:
                 return const Text('The library is empty');
               case CharactersListState.loading:
                 return const CircularProgressIndicator();
               case CharactersListState.idle:
                 return _Idle(
-                  characters: _charactersListStore.characters,
+                  charactersListStore: charactersListStore,
+                  filterCharactersStore: filterCharactersStore,
+                  characters: charactersListStore.characters,
                 );
               case CharactersListState.error:
                 return const Text('Something went wrong');
@@ -99,26 +103,44 @@ class _FloatingActionButton extends StatelessWidget {
 }
 
 class _Idle extends StatelessWidget {
-  const _Idle({required this.characters});
+  const _Idle({
+    required this.charactersListStore,
+    required this.filterCharactersStore,
+    required this.characters,
+  });
 
+  final CharactersListStore charactersListStore;
+  final FilterCharactersStore filterCharactersStore;
   final List<Character> characters;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: ListView.separated(
-        itemBuilder: (BuildContext context, int index) {
-          return _CharacterTile(
-            character: characters[index],
-          );
-        },
-        itemCount: characters.length,
-        separatorBuilder: (BuildContext context, int index) {
-          return const Column(
-            children: [Gap(4), Divider(), Gap(4)],
-          );
-        },
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.separated(
+              itemBuilder: (BuildContext context, int index) {
+                return _CharacterTile(
+                  character: characters[index],
+                );
+              },
+              itemCount: characters.length,
+              separatorBuilder: (BuildContext context, int index) {
+                return const Column(
+                  children: [Gap(4), Divider(), Gap(4)],
+                );
+              },
+            ),
+          ),
+          Center(
+            child: Paginator(
+              charactersListStore: charactersListStore,
+              filterCharactersStore: filterCharactersStore,
+            ),
+          ),
+        ],
       ),
     );
   }
