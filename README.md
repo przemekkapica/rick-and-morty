@@ -1,16 +1,17 @@
-# rick_and_morty
+# Rick and Morty characters library
 
-A new Flutter project.
+Flutter app that views all Rick and Morty characters, allows to filter them and add to favorites.
 
-## Getting Started
+## Installation
 
-This project is a starting point for a Flutter application.
+- First of all, install flutter in version: (check version in pubspec.yaml)
+- make sure that you have Xcode and Android Studio installed correctly
+- run command `flutter doctor` and get rid of all errors
 
-A few resources to get you started if this is your first Flutter project:
+## Preparing
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- run command: `flutter pub get` to fetch all required dependencies
+- run command: `flutter pub run build_runner build` to build code-gen elements
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Running
+- run command `flutter run`
