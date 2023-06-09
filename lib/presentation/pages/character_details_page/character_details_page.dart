@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:gap/gap.dart';
+import 'package:rick_and_morty/core/di/di_config.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/gender.dart';
 import 'package:rick_and_morty/domain/characters/model/status.dart';
 import 'package:rick_and_morty/presentation/extensions/string_extension.dart';
+import 'package:rick_and_morty/presentation/stores/character_details_store.dart';
 
 class CharacterDetailsPage extends StatefulWidget {
   const CharacterDetailsPage({
@@ -18,65 +21,121 @@ class CharacterDetailsPage extends StatefulWidget {
 }
 
 class _CharacterDetailsPageState extends State<CharacterDetailsPage> {
+  final CharacterDetailsStore characterDetailsStore =
+      getIt<CharacterDetailsStore>();
+
   @override
   Widget build(BuildContext context) {
     final Character character = widget.character;
 
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
+      appBar: const _AppBar(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Hero(
-                tag: 'character-image${character.id.toString()}',
-                child: Image.network(
-                  character.image.toString(),
-                  width: 260,
-                  height: 260,
-                ),
-              ),
-            ),
-            const Gap(16),
-            Text(
-              character.name,
-              style: Theme.of(context)
-                  .textTheme
-                  .displaySmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const Gap(16),
-            _DataRow(
-              firstLabel: 'Status',
-              firstValue: character.status.value,
-              secondLabel: 'Species',
-              secondValue: character.species,
-            ),
-            const Gap(16),
-            _DataRow(
-              firstLabel: 'Type',
-              firstValue: character.type,
-              secondLabel: 'Gender',
-              secondValue: character.gender.value,
-            ),
-            const Gap(32),
-            _DataField(
-              label: 'Last seen in',
-              value: character.location,
-            ),
-            const Gap(16),
-            _DataField(
-              label: 'Origin',
-              value: character.origin,
-            ),
-          ],
+        child: Observer(
+          builder: (context) {
+            switch (characterDetailsStore.state) {
+              case CharacterDetailsState.error:
+                return const Text('Something went wrong');
+              case CharacterDetailsState.idle:
+                return _CharacterDetails(
+                  characterDetailsStore: characterDetailsStore,
+                  character: character,
+                );
+            }
+          },
         ),
       ),
+    );
+  }
+}
+
+class _CharacterDetails extends StatelessWidget {
+  const _CharacterDetails({
+    required this.characterDetailsStore,
+    required this.character,
+  });
+
+  final CharacterDetailsStore characterDetailsStore;
+  final Character character;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Center(
+          child: Hero(
+            tag: 'character-image${character.id.toString()}',
+            child: Image.network(
+              character.image.toString(),
+              width: 260,
+              height: 260,
+            ),
+          ),
+        ),
+        const Gap(16),
+        _CharacterNameRow(
+          character: character,
+          characterDetailsStore: characterDetailsStore,
+        ),
+        const Gap(16),
+        _DataRow(
+          firstLabel: 'Status',
+          firstValue: character.status.value,
+          secondLabel: 'Species',
+          secondValue: character.species,
+        ),
+        const Gap(16),
+        _DataRow(
+          firstLabel: 'Type',
+          firstValue: character.type,
+          secondLabel: 'Gender',
+          secondValue: character.gender.value,
+        ),
+        const Gap(32),
+        _DataField(
+          label: 'Last seen in',
+          value: character.location,
+        ),
+        const Gap(16),
+        _DataField(
+          label: 'Origin',
+          value: character.origin,
+        ),
+      ],
+    );
+  }
+}
+
+class _CharacterNameRow extends StatelessWidget {
+  const _CharacterNameRow({
+    required this.character,
+    required this.characterDetailsStore,
+  });
+
+  final Character character;
+  final CharacterDetailsStore characterDetailsStore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            character.name,
+            style: Theme.of(context)
+                .textTheme
+                .displaySmall
+                ?.copyWith(fontWeight: FontWeight.bold),
+          ),
+        ),
+        const Gap(8),
+        IconButton(
+          onPressed: () => characterDetailsStore.addToFavorites(character),
+          icon: const Icon(Icons.favorite_border_outlined, size: 30),
+        ),
+      ],
     );
   }
 }
@@ -139,4 +198,19 @@ class _DataField extends StatelessWidget {
       ],
     );
   }
+}
+
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _AppBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      iconTheme: const IconThemeData(color: Colors.white),
+      backgroundColor: Theme.of(context).primaryColor,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

@@ -25,24 +25,23 @@ class _FavoritesPageState extends State<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        iconTheme: const IconThemeData(color: Colors.white),
-        title: Text(
-          'Favorites',
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(color: Colors.white),
-        ),
-        backgroundColor: Theme.of(context).primaryColor,
-      ),
+      appBar: const _AppBar(),
       body: Center(
         child: Observer(
           builder: (context) {
-            return _Idle(
-              favorites: favoritesStore.favorites,
-              favoritesStore: favoritesStore,
-            );
+            switch (favoritesStore.state) {
+              case FavoritesState.loading:
+                return const CircularProgressIndicator();
+              case FavoritesState.empty:
+                return const Text('Your favorites list is empty');
+              case FavoritesState.idle:
+                return _Idle(
+                  favorites: favoritesStore.favorites,
+                  favoritesStore: favoritesStore,
+                );
+              case FavoritesState.error:
+                return const Text('Something went wrong');
+            }
           },
         ),
       ),
@@ -69,4 +68,26 @@ class _Idle extends StatelessWidget {
       ),
     );
   }
+}
+
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _AppBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      iconTheme: const IconThemeData(color: Colors.white),
+      title: Text(
+        'Favorites',
+        style: Theme.of(context)
+            .textTheme
+            .titleMedium
+            ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

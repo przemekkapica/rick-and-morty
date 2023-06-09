@@ -47,7 +47,7 @@ class _CharactersListPageState extends State<CharactersListPage> {
           builder: (context) {
             switch (charactersListStore.state) {
               case CharactersListState.empty:
-                return const Text('The library is empty');
+                return const Text('No characters were found');
               case CharactersListState.loading:
                 return const CircularProgressIndicator();
               case CharactersListState.idle:

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
@@ -8,8 +9,6 @@ import 'package:rick_and_morty/domain/use_cases/add_to_favorites.dart';
 import 'package:rick_and_morty/domain/use_cases/get_characters.dart';
 
 part 'characters_list_store.g.dart';
-
-typedef Characters = List<Character>;
 
 enum CharactersListState { empty, loading, idle, error }
 
@@ -39,7 +38,7 @@ abstract class _CharactersListStore with Store {
   final AddToFavorites _addToFavorites;
 
   @observable
-  Characters characters = [];
+  List<Character> characters = [];
 
   @observable
   PaginationInfo paginationInfo = initialPagination;
@@ -53,12 +52,16 @@ abstract class _CharactersListStore with Store {
     ),
   );
 
+  @readonly
+  CharactersListState _state = CharactersListState.loading;
+
   @action
   Future<void> fetchCharacters(
     int? pageNumber,
     int? pageModifier,
     CharactersFilter? filter,
   ) async {
+    _state = CharactersListState.loading;
     try {
       if (pageNumber != null) {
         _asignCharactersPageFuture(pageNumber, filter);
@@ -68,13 +71,36 @@ abstract class _CharactersListStore with Store {
           filter,
         );
       }
-
       final response = await _charactersPageFuture;
 
-      characters = response.characters;
       paginationInfo = response.paginationInfo;
+      characters = response.characters;
+
+      _emitLoaded();
+    } on DioException catch (e) {
+      _handleDioException(e);
     } catch (e) {
-      print(e);
+      _state = CharactersListState.error;
+    }
+  }
+
+  void _emitLoaded() {
+    if (characters.isEmpty) {
+      _state = CharactersListState.empty;
+    } else {
+      _state = CharactersListState.idle;
+    }
+  }
+
+  void _handleDioException(DioException e) {
+    if (e.response != null) {
+      if (e.response!.statusCode != null && e.response!.statusCode! == 404) {
+        _state = CharactersListState.empty;
+      } else {
+        _state = CharactersListState.error;
+      }
+    } else {
+      _state = CharactersListState.error;
     }
   }
 
@@ -90,19 +116,5 @@ abstract class _CharactersListStore with Store {
   @action
   Future<void> addToFavorites(Character character) async {
     return await _addToFavorites(character);
-  }
-
-  @computed
-  CharactersListState get state {
-    switch (_charactersPageFuture.status) {
-      case FutureStatus.pending:
-        return CharactersListState.loading;
-      case FutureStatus.fulfilled:
-        return CharactersListState.idle;
-      case FutureStatus.rejected:
-        return CharactersListState.error;
-      default:
-        return CharactersListState.empty;
-    }
   }
 }
