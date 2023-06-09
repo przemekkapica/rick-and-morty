@@ -32,71 +32,73 @@ class FilterCharactersBottomSheet extends StatelessWidget {
           right: 24.0,
           bottom: MediaQuery.of(context).viewInsets.bottom + 24.0,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text(
-              'Filter characters',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const Gap(16),
-            TextFormField(
-              initialValue: filterCharactersStore.name,
-              decoration: const InputDecoration(
-                labelText: 'Name',
-                hintText: 'Name',
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              Text(
+                'Filter characters',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
-              onChanged: (value) => filterCharactersStore.setName(value),
-            ),
-            const Gap(8),
-            TextFormField(
-              initialValue: filterCharactersStore.species,
-              decoration: const InputDecoration(
-                labelText: 'Species',
-                hintText: 'Species',
+              const Gap(16),
+              TextFormField(
+                initialValue: filterCharactersStore.name,
+                decoration: const InputDecoration(
+                  labelText: 'Name',
+                  hintText: 'Name',
+                ),
+                onChanged: (value) => filterCharactersStore.setName(value),
               ),
-              onChanged: (value) => filterCharactersStore.setSpecies(value),
-            ),
-            const Gap(24),
-            const Text('Status'),
-            GroupButton<Status>(
-              controller: statusController,
-              enableDeselect: true,
-              onSelected: (status, index, selected) =>
-                  filterCharactersStore.setStatus(status, selected),
-              buttons: Status.values,
-              buttonTextBuilder: (selected, value, context) => value.value,
-            ),
-            const Gap(16),
-            const Text('Gender'),
-            GroupButton<Gender>(
-              controller: genderController,
-              enableDeselect: true,
-              onSelected: (gender, index, selected) =>
-                  filterCharactersStore.setGender(gender, selected),
-              buttons: Gender.values,
-              buttonTextBuilder: (selected, value, context) => value.value,
-            ),
-            const Gap(16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                child: const Text('Filter'),
-                onPressed: () {
-                  charactersListStore.fetchCharacters(
-                    1,
-                    null,
-                    filterCharactersStore.filter,
-                  );
-                  Navigator.of(context).pop();
-                },
+              const Gap(8),
+              TextFormField(
+                initialValue: filterCharactersStore.species,
+                decoration: const InputDecoration(
+                  labelText: 'Species',
+                  hintText: 'Species',
+                ),
+                onChanged: (value) => filterCharactersStore.setSpecies(value),
               ),
-            )
-          ],
+              const Gap(24),
+              const Text('Status'),
+              GroupButton<Status>(
+                controller: statusController,
+                enableDeselect: true,
+                onSelected: (status, index, selected) =>
+                    filterCharactersStore.setStatus(status, selected),
+                buttons: Status.values,
+                buttonTextBuilder: (selected, value, context) => value.value,
+              ),
+              const Gap(16),
+              const Text('Gender'),
+              GroupButton<Gender>(
+                controller: genderController,
+                enableDeselect: true,
+                onSelected: (gender, index, selected) =>
+                    filterCharactersStore.setGender(gender, selected),
+                buttons: Gender.values,
+                buttonTextBuilder: (selected, value, context) => value.value,
+              ),
+              const Gap(16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  child: const Text('Filter'),
+                  onPressed: () {
+                    charactersListStore.fetchCharacters(
+                      1,
+                      null,
+                      filterCharactersStore.filter,
+                    );
+                    Navigator.of(context).pop();
+                  },
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

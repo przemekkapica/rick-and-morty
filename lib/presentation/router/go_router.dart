@@ -16,7 +16,7 @@ GoRouter goRouter() {
 
 final charactersListPageRoute = GoRoute(
   path: '/',
-  builder: (_, __) => const CharactersListPage(),
+  builder: (_, __) => CharactersListPage(),
 );
 
 final characterDetailsPageRoute = GoRoute(

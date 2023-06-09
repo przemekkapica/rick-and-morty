@@ -4,6 +4,7 @@ import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_page.f.dart';
 import 'package:rick_and_morty/domain/characters/model/pagination_info.f.dart';
+import 'package:rick_and_morty/domain/use_cases/add_to_favorites.dart';
 import 'package:rick_and_morty/domain/use_cases/get_characters.dart';
 
 part 'characters_list_store.g.dart';
@@ -22,13 +23,20 @@ final initialPagination = PaginationInfo(
 @injectable
 class CharactersListStore extends _CharactersListStore
     with _$CharactersListStore {
-  CharactersListStore(super.getCharacters);
+  CharactersListStore(
+    super.getCharacters,
+    super._addToFavorites,
+  );
 }
 
 abstract class _CharactersListStore with Store {
-  _CharactersListStore(this._getCharacters);
+  _CharactersListStore(
+    this._getCharacters,
+    this._addToFavorites,
+  );
 
   final GetCharacters _getCharacters;
+  final AddToFavorites _addToFavorites;
 
   @observable
   Characters characters = [];
@@ -77,6 +85,11 @@ abstract class _CharactersListStore with Store {
         filter ?? const CharactersFilter(),
       ),
     );
+  }
+
+  @action
+  Future<void> addToFavorites(Character character) async {
+    return await _addToFavorites(character);
   }
 
   @computed

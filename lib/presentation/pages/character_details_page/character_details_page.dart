@@ -26,7 +26,7 @@ class _CharacterDetailsPageState extends State<CharacterDetailsPage> {
               .titleLarge
               ?.copyWith(color: Colors.white),
         ),
-        // backgroundColor: Theme.of(context).primaryColorDark,
+        backgroundColor: Theme.of(context).primaryColor,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -35,7 +35,7 @@ class _CharacterDetailsPageState extends State<CharacterDetailsPage> {
           children: [
             Center(
               child: Hero(
-                tag: 'character-image${widget.character.id}',
+                tag: 'character-image${widget.character.id.toString()}',
                 child: Image.network(
                   widget.character.image.toString(),
                   width: 260,
