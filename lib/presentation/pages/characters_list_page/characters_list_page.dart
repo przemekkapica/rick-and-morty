@@ -37,26 +37,7 @@ class _CharactersListPageState extends State<CharactersListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Rick and Morty characters library',
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium
-              ?.copyWith(color: Colors.white),
-        ),
-        centerTitle: false,
-        backgroundColor: Theme.of(context).primaryColor,
-        actions: [
-          IconButton(
-            onPressed: () => context.push(favoritesPageRoute.path),
-            icon: const Icon(
-              Icons.favorite,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ),
+      appBar: const _AppBar(),
       floatingActionButton: _FloatingActionButton(
         charactersListStore: charactersListStore,
         filterCharactersStore: filterCharactersStore,
@@ -118,6 +99,33 @@ class _Idle extends StatelessWidget {
       ),
     );
   }
+}
+
+class _AppBar extends StatelessWidget implements PreferredSizeWidget {
+  const _AppBar();
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      title: Image.asset(
+        'assets/images/rick_and_morty_logo.png',
+        height: 80,
+      ),
+      backgroundColor: Theme.of(context).primaryColor,
+      actions: [
+        IconButton(
+          onPressed: () => context.push(favoritesPageRoute.path),
+          icon: const Icon(
+            Icons.favorite,
+            color: Colors.white,
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class _FloatingActionButton extends StatelessWidget {
