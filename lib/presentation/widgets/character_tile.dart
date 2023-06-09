@@ -35,7 +35,7 @@ class CharacterTile extends StatelessWidget {
     );
   }
 
-  Future<Object?> _onCharacterTileTap(BuildContext context) {
+  Future<void> _onCharacterTileTap(BuildContext context) {
     return context.pushNamed(
       characterDetailsPageRoute.name!,
       pathParameters: {'id': character.id.toString()},

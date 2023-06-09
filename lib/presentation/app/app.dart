@@ -13,7 +13,6 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       routerConfig: goRouter(),
-      title: 'Rick and Morty characters library',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
