@@ -23,7 +23,7 @@ class CharactersRepositoryImpl implements CharactersRepository {
 
   @override
   Future<List<Character>> getCharacters(
-    int page,
+    int? page,
     CharactersFilter filter,
   ) async {
     final response = await _dataSource.getCharacters(

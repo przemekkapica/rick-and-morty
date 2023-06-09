@@ -16,3 +16,12 @@ extension StatusExtension on Status {
     }
   }
 }
+
+extension StringStatus on String {
+  Status get toStatus {
+    return Status.values.firstWhere(
+      (e) => e.toString() == 'Status.${toLowerCase()}',
+      orElse: () => Status.unknown,
+    );
+  }
+}

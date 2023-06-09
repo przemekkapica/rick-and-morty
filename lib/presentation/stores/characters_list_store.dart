@@ -21,33 +21,25 @@ abstract class _CharactersListStore with Store {
 
   final GetCharacters _getCharacters;
 
-  @readonly
-  Characters _characters = [];
+  @observable
+  Characters characters = [];
 
   @observable
   ObservableFuture<Characters> _charactersFuture = ObservableFuture.value([]);
 
-  @observable
-  CharactersFilter filter = const CharactersFilter();
-
-  @observable
-  int pageNumnber = 1;
-
   @action
-  Future<Characters> fetchCharacters(
-      int pageNumber, CharactersFilter? filter) async {
+  Future<void> fetchCharacters(
+    CharactersFilter? filter,
+  ) async {
     try {
       _charactersFuture = ObservableFuture(
-        _getCharacters(pageNumnber, filter ?? CharactersFilter()),
+        _getCharacters(null, filter ?? const CharactersFilter()),
       );
 
-      _characters = await _charactersFuture;
-      return _characters;
+      characters = await _charactersFuture;
     } catch (e) {
       print(e);
     }
-
-    return [];
   }
 
   @computed

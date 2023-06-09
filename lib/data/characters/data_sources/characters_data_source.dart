@@ -13,7 +13,7 @@ abstract class CharactersDataSource {
 
   @GET('/character')
   Future<GetCharactersDTO> getCharacters(
-    @Query('page') int page,
+    @Query('page') int? page,
     @Query('name') String? name,
     @Query('status') String? status,
     @Query('species') String? species,

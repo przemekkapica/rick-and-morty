@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
-import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:rick_and_morty/core/di/di_config.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
-import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
 import 'package:rick_and_morty/domain/characters/model/status.dart';
+import 'package:rick_and_morty/presentation/pages/characters_list_page/widgets/filter_characters_bottom_sheet.dart';
 import 'package:rick_and_morty/presentation/router/go_router.dart';
 import 'package:rick_and_morty/presentation/stores/characters_list_store.dart';
+import 'package:rick_and_morty/presentation/stores/filter_characters_store.dart';
 
 class CharactersListPage extends StatefulWidget {
   const CharactersListPage({super.key});
@@ -18,14 +18,15 @@ class CharactersListPage extends StatefulWidget {
 }
 
 class _CharactersListPageState extends State<CharactersListPage> {
-  late CharactersListStore _charactersListStore;
+  final CharactersListStore _charactersListStore = getIt<CharactersListStore>();
+  final FilterCharactersStore _filterCharactersStore =
+      getIt<FilterCharactersStore>();
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _charactersListStore = getIt<CharactersListStore>();
 
-    _charactersListStore.fetchCharacters(1, null);
+    _charactersListStore.fetchCharacters(null);
   }
 
   @override
@@ -42,11 +43,9 @@ class _CharactersListPageState extends State<CharactersListPage> {
         centerTitle: false,
         backgroundColor: Theme.of(context).primaryColor,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Icon(
-          Icons.filter_alt,
-        ),
+      floatingActionButton: _FloatingActionButton(
+        charactersListStore: _charactersListStore,
+        filterCharactersStore: _filterCharactersStore,
       ),
       body: Center(
         child: Observer(
@@ -66,6 +65,35 @@ class _CharactersListPageState extends State<CharactersListPage> {
           },
         ),
       ),
+    );
+  }
+}
+
+class _FloatingActionButton extends StatelessWidget {
+  const _FloatingActionButton({
+    required this.charactersListStore,
+    required this.filterCharactersStore,
+  });
+
+  final CharactersListStore charactersListStore;
+  final FilterCharactersStore filterCharactersStore;
+
+  @override
+  Widget build(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () {
+        showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          builder: (BuildContext context) {
+            return FilterCharactersBottomSheet(
+              charactersListStore: charactersListStore,
+              filterCharactersStore: filterCharactersStore,
+            );
+          },
+        );
+      },
+      child: const Icon(Icons.filter_alt),
     );
   }
 }

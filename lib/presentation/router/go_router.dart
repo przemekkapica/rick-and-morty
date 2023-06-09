@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/presentation/pages/character_details_page.dart';
-import 'package:rick_and_morty/presentation/pages/characters_list_page.dart';
+import 'package:rick_and_morty/presentation/pages/characters_list_page/characters_list_page.dart';
 
 GoRouter goRouter() {
   return GoRouter(

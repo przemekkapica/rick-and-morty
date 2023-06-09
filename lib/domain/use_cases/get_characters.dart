@@ -9,7 +9,10 @@ class GetCharacters {
 
   final CharactersRepository _repository;
 
-  Future<List<Character>> call(int page, CharactersFilter filter) async {
-    return await _repository.getCharacters(page, filter);
+  Future<List<Character>> call(int? page, CharactersFilter? filter) async {
+    return await _repository.getCharacters(
+      page,
+      filter.isFilterEnabled ? filter!.normalize : const CharactersFilter(),
+    );
   }
 }
