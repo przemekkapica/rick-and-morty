@@ -3,7 +3,7 @@ import 'package:rick_and_morty/domain/characters/characters_repository.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_page.f.dart';
-import 'package:rick_and_morty/domain/pagination/model/pagination_info.f.dart';
+import 'package:rick_and_morty/domain/characters/model/pagination_info.f.dart';
 import 'package:rick_and_morty/domain/use_cases/get_characters.dart';
 
 class MockCharactersRepository extends Mock implements CharactersRepository {}

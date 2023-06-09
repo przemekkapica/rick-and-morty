@@ -24,6 +24,10 @@ dependencies:
   gap: ^3.0.0
   infinite_scroll_pagination: ^3.2.0
   group_button: ^5.3.0
+  isar: ^3.1.0+1
+  isar_flutter_libs: ^3.1.0+1
+  path_provider: ^2.0.15
+  json_annotation: ^4.8.1
 
 dev_dependencies:
   flutter_test:
@@ -35,6 +39,7 @@ dev_dependencies:
   injectable_generator: ^2.1.6
   retrofit_generator: ^7.0.1
   mobx_codegen: ^2.3.0
+  isar_generator: ^3.1.0+1
 
 flutter:
   uses-material-design: true

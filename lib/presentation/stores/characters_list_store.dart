@@ -3,7 +3,7 @@ import 'package:mobx/mobx.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_page.f.dart';
-import 'package:rick_and_morty/domain/pagination/model/pagination_info.f.dart';
+import 'package:rick_and_morty/domain/characters/model/pagination_info.f.dart';
 import 'package:rick_and_morty/domain/use_cases/get_characters.dart';
 
 part 'characters_list_store.g.dart';
@@ -11,6 +11,13 @@ part 'characters_list_store.g.dart';
 typedef Characters = List<Character>;
 
 enum CharactersListState { empty, loading, idle, error }
+
+final initialPagination = PaginationInfo(
+  currentPage: 1,
+  totalPages: 1,
+  hasPrevious: false,
+  hasNext: true,
+);
 
 @injectable
 class CharactersListStore extends _CharactersListStore
@@ -27,24 +34,14 @@ abstract class _CharactersListStore with Store {
   Characters characters = [];
 
   @observable
-  PaginationInfo paginationInfo = PaginationInfo(
-    currentPage: 1,
-    totalPages: 1,
-    hasPrevious: false,
-    hasNext: true,
-  );
+  PaginationInfo paginationInfo = initialPagination;
 
   @observable
   ObservableFuture<CharactersPage> _charactersPageFuture =
       ObservableFuture.value(
     CharactersPage(
       characters: [],
-      paginationInfo: PaginationInfo(
-        currentPage: 1,
-        totalPages: 1,
-        hasPrevious: false,
-        hasNext: true,
-      ),
+      paginationInfo: initialPagination,
     ),
   );
 
@@ -84,9 +81,6 @@ abstract class _CharactersListStore with Store {
 
   @computed
   CharactersListState get state {
-    if (_charactersPageFuture.value == []) {
-      return CharactersListState.empty;
-    }
     switch (_charactersPageFuture.status) {
       case FutureStatus.pending:
         return CharactersListState.loading;

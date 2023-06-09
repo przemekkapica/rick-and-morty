@@ -44,6 +44,15 @@ class _CharactersListPageState extends State<CharactersListPage> {
         ),
         centerTitle: false,
         backgroundColor: Theme.of(context).primaryColor,
+        actions: [
+          IconButton(
+            onPressed: () => context.push(favoritesPageRoute.path),
+            icon: const Icon(
+              Icons.favorite,
+              color: Colors.white,
+            ),
+          ),
+        ],
       ),
       floatingActionButton: _FloatingActionButton(
         charactersListStore: charactersListStore,
@@ -200,7 +209,7 @@ class _CharacterTile extends StatelessWidget {
   Future<Object?> _onCharacterTileTap(BuildContext context) {
     return context.pushNamed(
       characterDetailsPageRoute.name!,
-      pathParameters: {'id': character.id},
+      pathParameters: {'id': character.id.toString()},
       extra: character,
     );
   }

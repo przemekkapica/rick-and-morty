@@ -18,10 +18,10 @@ class CharacterMapper extends DataMapper<CharacterDTO, Character> {
   @override
   Character call(CharacterDTO dto) {
     return Character(
-      id: dto.id.toString(),
+      id: dto.id,
       name: dto.name,
       status: _statusMapper.fromDTO(dto.status),
-      image: Uri.parse(dto.image),
+      image: dto.image,
       species: dto.species,
       created: dto.created,
       gender: _genderMapper.fromDTO(dto.gender),

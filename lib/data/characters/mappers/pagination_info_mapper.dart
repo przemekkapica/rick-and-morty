@@ -1,7 +1,7 @@
 import 'package:injectable/injectable.dart';
-import 'package:rick_and_morty/data/pagination/dtos/pagination_info_dto.dart';
+import 'package:rick_and_morty/data/characters/dtos/pagination_info_dto.dart';
 import 'package:rick_and_morty/domain/mappers/data_mapper.dart';
-import 'package:rick_and_morty/domain/pagination/model/pagination_info.f.dart';
+import 'package:rick_and_morty/domain/characters/model/pagination_info.f.dart';
 
 const _pageQueryParam = 'page';
 
