@@ -29,5 +29,5 @@ final characterDetailsPageRoute = GoRoute(
 
 final favoritesPageRoute = GoRoute(
   path: '/favorites',
-  builder: (_, state) => const FavoritesPage(),
+  builder: (_, __) => const FavoritesPage(),
 );

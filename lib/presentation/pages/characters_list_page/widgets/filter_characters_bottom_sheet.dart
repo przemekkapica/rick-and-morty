@@ -63,7 +63,13 @@ class FilterCharactersBottomSheet extends StatelessWidget {
                 onChanged: (value) => filterCharactersStore.setSpecies(value),
               ),
               const Gap(24),
-              const Text('Status'),
+              Text(
+                'Status',
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: Colors.grey),
+              ),
               GroupButton<Status>(
                 controller: statusController,
                 enableDeselect: true,
@@ -73,7 +79,13 @@ class FilterCharactersBottomSheet extends StatelessWidget {
                 buttonTextBuilder: (selected, value, context) => value.value,
               ),
               const Gap(16),
-              const Text('Gender'),
+              Text(
+                'Gender',
+                style: Theme.of(context)
+                    .textTheme
+                    .labelMedium
+                    ?.copyWith(color: Colors.grey),
+              ),
               GroupButton<Gender>(
                 controller: genderController,
                 enableDeselect: true,
