@@ -1,6 +1,8 @@
 import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
+import 'package:rick_and_morty/domain/characters/model/base_character.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
+import 'package:rick_and_morty/domain/favorites/model/favorite_character.f.dart';
 import 'package:rick_and_morty/domain/use_cases/add_to_favorites.dart';
 import 'package:rick_and_morty/domain/use_cases/remove_from_favorites.dart';
 
@@ -40,7 +42,7 @@ abstract class _CharacterDetailsStore with Store {
   }
 
   @action
-  Future<void> addToFavorites(Character character) async {
+  Future<void> addToFavorites(BaseCharacter character) async {
     try {
       await _addToFavorites(character);
       _state = CharacterDetailsState.idle;

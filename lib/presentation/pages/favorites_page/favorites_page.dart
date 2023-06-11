@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:rick_and_morty/core/di/di_config.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
+import 'package:rick_and_morty/domain/favorites/model/favorite_character.f.dart';
 import 'package:rick_and_morty/presentation/stores/favorites_store.dart';
 import 'package:rick_and_morty/presentation/widgets/characters_list.dart';
 
@@ -56,7 +57,7 @@ class _Idle extends StatelessWidget {
   });
 
   final FavoritesStore favoritesStore;
-  final List<Character> favorites;
+  final List<FavoriteCharacter> favorites;
 
   @override
   Widget build(BuildContext context) {

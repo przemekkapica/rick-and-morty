@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
+import 'package:rick_and_morty/domain/characters/model/base_character.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/status.dart';
 import 'package:rick_and_morty/presentation/router/go_router.dart';
@@ -12,8 +14,8 @@ class CharacterTile extends StatelessWidget {
     super.key,
   });
 
-  final Character character;
-  final Function(Character) onFavoritesTap;
+  final BaseCharacter character;
+  final Function(BaseCharacter) onFavoritesTap;
 
   @override
   Widget build(BuildContext context) {
@@ -47,16 +49,26 @@ class CharacterTile extends StatelessWidget {
 class _CharacterAvatar extends StatelessWidget {
   const _CharacterAvatar({required this.character});
 
-  final Character character;
+  final BaseCharacter character;
 
   @override
   Widget build(BuildContext context) {
     return Hero(
       tag: 'character-image${character.id.toString()}',
-      child: Image.network(
-        character.image.toString(),
-        width: 64,
-        height: 64,
+      child: CachedNetworkImage(
+        imageUrl: character.image.toString(),
+        imageBuilder: (_, imageProvider) => Container(
+          width: 64,
+          height: 64,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: imageProvider,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        placeholder: (context, url) => CircularProgressIndicator(),
+        errorWidget: (context, url, error) => Icon(Icons.error),
       ),
     );
   }
@@ -65,7 +77,7 @@ class _CharacterAvatar extends StatelessWidget {
 class _CharacterInfo extends StatelessWidget {
   const _CharacterInfo({required this.character});
 
-  final Character character;
+  final BaseCharacter character;
 
   @override
   Widget build(BuildContext context) {

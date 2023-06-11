@@ -1,6 +1,8 @@
 import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
+import 'package:rick_and_morty/domain/characters/model/base_character.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
+import 'package:rick_and_morty/domain/favorites/model/favorite_character.f.dart';
 import 'package:rick_and_morty/domain/use_cases/get_favorites.dart';
 import 'package:rick_and_morty/domain/use_cases/remove_from_favorites.dart';
 
@@ -11,7 +13,7 @@ enum FavoritesState { loading, empty, idle, error }
 @injectable
 class FavoritesStore extends _FavoritesStore with _$FavoritesStore {
   FavoritesStore(
-    super.getFavorites,
+    super._getFavorites,
     super._removeFromFavorites,
   );
 }
@@ -29,7 +31,7 @@ abstract class _FavoritesStore with Store {
   FavoritesState _state = FavoritesState.loading;
 
   @observable
-  List<Character> favorites = [];
+  List<FavoriteCharacter> favorites = [];
 
   @action
   Future<void> fetchFavorites() async {
@@ -43,7 +45,7 @@ abstract class _FavoritesStore with Store {
   }
 
   @action
-  Future<void> removeFromFavorites(Character character) async {
+  Future<void> removeFromFavorites(BaseCharacter character) async {
     try {
       await _removeFromFavorites(character.id);
       favorites = await _getFavorites();

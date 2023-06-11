@@ -1,12 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
+import 'package:rick_and_morty/domain/characters/model/base_character.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_page.f.dart';
 import 'package:rick_and_morty/domain/characters/model/pagination_info.f.dart';
+import 'package:rick_and_morty/domain/favorites/model/favorite_character.f.dart';
+import 'package:rick_and_morty/domain/networking/model/connection_state.dart';
 import 'package:rick_and_morty/domain/use_cases/add_to_favorites.dart';
 import 'package:rick_and_morty/domain/use_cases/get_characters.dart';
+import 'package:rick_and_morty/domain/use_cases/get_connection_status.dart';
+import 'package:rick_and_morty/domain/use_cases/get_connection_status_stream.dart';
+import 'package:rick_and_morty/domain/use_cases/get_local_characters.dart';
+import 'package:rick_and_morty/domain/use_cases/remove_from_favorites.dart';
 
 part 'characters_list_store.g.dart';
 
@@ -25,6 +32,10 @@ class CharactersListStore extends _CharactersListStore
   CharactersListStore(
     super.getCharacters,
     super._addToFavorites,
+    super._getLocalCharacters,
+    super._removeFromFavorites,
+    super._getConnectionStatus,
+    super._getConnectionStatusStream,
   );
 }
 
@@ -32,10 +43,18 @@ abstract class _CharactersListStore with Store {
   _CharactersListStore(
     this._getCharacters,
     this._addToFavorites,
+    this._removeFromFavorites,
+    this._getLocalCharacters,
+    this._getConnectionStatus,
+    this._getConnectionStatusStream,
   );
 
   final GetCharacters _getCharacters;
+  final GetLocalCharacters _getLocalCharacters;
   final AddToFavorites _addToFavorites;
+  final RemoveFromFavorites _removeFromFavorites;
+  final GetConnectionStatus _getConnectionStatus;
+  final GetConnectionStatusStream _getConnectionStatusStream;
 
   @observable
   List<Character> characters = [];
@@ -62,25 +81,36 @@ abstract class _CharactersListStore with Store {
     CharactersFilter? filter,
   ) async {
     _state = CharactersListState.loading;
-    try {
-      if (pageNumber != null) {
-        _asignCharactersPageFuture(pageNumber, filter);
-      } else {
-        _asignCharactersPageFuture(
-          paginationInfo.currentPage + (pageModifier ?? 0),
-          filter,
-        );
+    final connectionStatus = await _getConnectionStatus();
+
+    if (connectionStatus.isConnected) {
+      try {
+        if (pageNumber != null) {
+          _asignCharactersPageFuture(pageNumber, filter);
+        } else {
+          _asignCharactersPageFuture(
+            paginationInfo.currentPage + (pageModifier ?? 0),
+            filter,
+          );
+        }
+        final response = await _charactersPageFuture;
+
+        paginationInfo = response.paginationInfo;
+        characters = response.characters;
+
+        _emitLoaded();
+      } on DioException catch (e) {
+        _handleDioException(e);
+      } catch (e) {
+        _state = CharactersListState.error;
       }
-      final response = await _charactersPageFuture;
-
-      paginationInfo = response.paginationInfo;
-      characters = response.characters;
-
-      _emitLoaded();
-    } on DioException catch (e) {
-      _handleDioException(e);
-    } catch (e) {
-      _state = CharactersListState.error;
+    } else {
+      try {
+        characters = await _getLocalCharacters();
+        _emitLoaded();
+      } catch (e) {
+        _state = CharactersListState.error;
+      }
     }
   }
 
@@ -114,7 +144,12 @@ abstract class _CharactersListStore with Store {
   }
 
   @action
-  Future<void> addToFavorites(Character character) async {
+  Future<void> addToFavorites(BaseCharacter character) async {
     return await _addToFavorites(character);
+  }
+
+  @action
+  Future<void> removeFromFavorites(int id) async {
+    return await _removeFromFavorites(id);
   }
 }

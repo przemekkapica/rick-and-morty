@@ -28,6 +28,7 @@ class CharacterMapper extends DataMapper<CharacterDTO, Character> {
       location: dto.location.name,
       origin: dto.origin.name,
       type: dto.type,
+      isFavorite: false,
     );
   }
 }

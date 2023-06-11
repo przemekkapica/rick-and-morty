@@ -1,24 +1,28 @@
 import 'package:injectable/injectable.dart';
-import 'package:rick_and_morty/data/characters/data_sources/characters_data_source.dart';
+import 'package:rick_and_morty/data/characters/data_sources/local/local_characters_data_source.dart';
+import 'package:rick_and_morty/data/characters/data_sources/remote/remote_characters_data_source.dart';
 import 'package:rick_and_morty/data/characters/mappers/character_mapper.dart';
 import 'package:rick_and_morty/data/characters/mappers/gender_mapper.dart';
 import 'package:rick_and_morty/data/characters/mappers/pagination_info_mapper.dart';
 import 'package:rick_and_morty/data/characters/mappers/status_mapper.dart';
 import 'package:rick_and_morty/domain/characters/characters_repository.dart';
+import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_page.f.dart';
 
 @LazySingleton(as: CharactersRepository)
 class CharactersRepositoryImpl implements CharactersRepository {
   CharactersRepositoryImpl(
-    this._dataSource,
+    this._remoteDataSource,
+    this._localDataSource,
     this._characterMapper,
     this._statusMapper,
     this._genderMapper,
     this._paginationInfoMapper,
   );
 
-  final CharactersDataSource _dataSource;
+  final RemoteCharactersDataSource _remoteDataSource;
+  final LocalCharactersDataSource _localDataSource;
   final CharacterMapper _characterMapper;
   final StatusMapper _statusMapper;
   final GenderMapper _genderMapper;
@@ -29,7 +33,7 @@ class CharactersRepositoryImpl implements CharactersRepository {
     int? page,
     CharactersFilter filter,
   ) async {
-    final response = await _dataSource.getCharacters(
+    final response = await _remoteDataSource.getCharacters(
       page,
       filter.name,
       filter.status != null ? _statusMapper.toDTO(filter.status!) : null,
@@ -46,5 +50,15 @@ class CharactersRepositoryImpl implements CharactersRepository {
       characters: characters,
       paginationInfo: paginationInfo,
     );
+  }
+
+  @override
+  Future<void> saveToDatabase(Character character) async {
+    return await _localDataSource.addCharacter(character);
+  }
+
+  @override
+  Future<List<Character>> getLocalCharacters() async {
+    return await _localDataSource.getCharacters();
   }
 }

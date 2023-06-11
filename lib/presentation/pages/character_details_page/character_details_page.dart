@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:gap/gap.dart';
 import 'package:rick_and_morty/core/di/di_config.dart';
+import 'package:rick_and_morty/domain/characters/model/base_character.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/gender.dart';
 import 'package:rick_and_morty/domain/characters/model/status.dart';
@@ -14,7 +16,7 @@ class CharacterDetailsPage extends StatefulWidget {
     super.key,
   });
 
-  final Character character;
+  final BaseCharacter character;
 
   @override
   State<CharacterDetailsPage> createState() => _CharacterDetailsPageState();
@@ -26,7 +28,7 @@ class _CharacterDetailsPageState extends State<CharacterDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final Character character = widget.character;
+    final BaseCharacter character = widget.character;
 
     return Scaffold(
       appBar: const _AppBar(),
@@ -57,7 +59,7 @@ class _CharacterDetails extends StatelessWidget {
   });
 
   final CharacterDetailsStore characterDetailsStore;
-  final Character character;
+  final BaseCharacter character;
 
   @override
   Widget build(BuildContext context) {
@@ -67,10 +69,20 @@ class _CharacterDetails extends StatelessWidget {
         Center(
           child: Hero(
             tag: 'character-image${character.id.toString()}',
-            child: Image.network(
-              character.image.toString(),
-              width: 260,
-              height: 260,
+            child: CachedNetworkImage(
+              imageUrl: character.image.toString(),
+              imageBuilder: (_, imageProvider) => Container(
+                width: 260,
+                height: 260,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              placeholder: (context, url) => CircularProgressIndicator(),
+              errorWidget: (context, url, error) => Icon(Icons.error),
             ),
           ),
         ),
@@ -114,7 +126,7 @@ class _CharacterNameRow extends StatelessWidget {
     required this.characterDetailsStore,
   });
 
-  final Character character;
+  final BaseCharacter character;
   final CharacterDetailsStore characterDetailsStore;
 
   @override

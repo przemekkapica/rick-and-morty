@@ -3,13 +3,13 @@ import 'package:injectable/injectable.dart';
 import 'package:retrofit/retrofit.dart';
 import 'package:rick_and_morty/data/characters/dtos/get_characters_dto.dart';
 
-part 'characters_data_source.g.dart';
+part 'remote_characters_data_source.g.dart';
 
 @RestApi()
 @injectable
-abstract class CharactersDataSource {
+abstract class RemoteCharactersDataSource {
   @factoryMethod
-  factory CharactersDataSource(Dio dio) = _CharactersDataSource;
+  factory RemoteCharactersDataSource(Dio dio) = _RemoteCharactersDataSource;
 
   @GET('/character')
   Future<GetCharactersDTO> getCharacters(
