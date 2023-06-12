@@ -31,7 +31,7 @@ class LocalCharactersDataSourceImpl implements LocalCharactersDataSource {
         .optional(filter.name != null,
             (q) => q.nameContains(filter.name!, caseSensitive: false))
         .optional(filter.species != null,
-            (q) => q.nameContains(filter.species!, caseSensitive: false))
+            (q) => q.speciesContains(filter.species!, caseSensitive: false))
         .optional(filter.status != null, (q) => q.statusEqualTo(filter.status!))
         .optional(filter.gender != null, (q) => q.genderEqualTo(filter.gender!))
         .findAll();

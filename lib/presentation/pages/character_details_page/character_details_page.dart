@@ -248,9 +248,9 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
       iconTheme: const IconThemeData(color: Colors.white),
       leading: IconButton(
         icon: const Icon(Icons.chevron_left),
-        onPressed: () async {
-          final characters = characterDetailsStore.getCharactersOnPop();
-          context.pop(characters);
+        onPressed: () {
+          // final characters = characterDetailsStore.getCharactersOnPop();
+          context.pop();
         },
       ),
       backgroundColor: Theme.of(context).primaryColor,
