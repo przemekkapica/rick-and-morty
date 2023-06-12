@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
+import 'package:go_router/go_router.dart';
 import 'package:rick_and_morty/core/di/di_config.dart';
-import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/favorites/model/favorite_character.f.dart';
 import 'package:rick_and_morty/presentation/stores/favorites_store.dart';
 import 'package:rick_and_morty/presentation/widgets/characters_list.dart';
@@ -26,7 +26,7 @@ class _FavoritesPageState extends State<FavoritesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const _AppBar(),
+      appBar: _AppBar(favoritesStore: favoritesStore),
       body: Center(
         child: Observer(
           builder: (context) {
@@ -72,7 +72,11 @@ class _Idle extends StatelessWidget {
 }
 
 class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar();
+  const _AppBar({
+    required this.favoritesStore,
+  });
+
+  final FavoritesStore favoritesStore;
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +88,13 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
             .textTheme
             .titleMedium
             ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      leading: IconButton(
+        icon: const Icon(Icons.chevron_left),
+        onPressed: () async {
+          final charactersPage = favoritesStore.getCharactersOnPop();
+          context.pop(charactersPage);
+        },
       ),
       backgroundColor: Theme.of(context).primaryColor,
     );

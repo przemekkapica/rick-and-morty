@@ -2,18 +2,19 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/favorites/favorites_repository.dart';
+import 'package:rick_and_morty/domain/favorites/model/favorite_character.f.dart';
 import 'package:rick_and_morty/domain/use_cases/add_to_favorites.dart';
 
 class MockFavoritesRepository extends Mock implements FavoritesRepository {}
 
-class MockCharacter extends Mock implements Character {}
+class MockFavoriteCharacter extends Mock implements FavoriteCharacter {}
 
 void main() {
   group('AddToFavorites', () {
     late MockFavoritesRepository favoritesRepository;
     late AddToFavorites addToFavorites;
 
-    final character = MockCharacter();
+    final character = MockFavoriteCharacter();
 
     setUpAll(() {
       favoritesRepository = MockFavoritesRepository();

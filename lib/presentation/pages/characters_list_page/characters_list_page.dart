@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rick_and_morty/core/di/di_config.dart';
-import 'package:rick_and_morty/domain/characters/model/base_character.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/presentation/pages/characters_list_page/widgets/filter_characters_bottom_sheet.dart';
 import 'package:rick_and_morty/presentation/router/go_router.dart';
@@ -38,7 +37,7 @@ class _CharactersListPageState extends State<CharactersListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const _AppBar(),
+      appBar: _AppBar(charactersListStore: charactersListStore),
       floatingActionButton: _FloatingActionButton(
         charactersListStore: charactersListStore,
         filterCharactersStore: filterCharactersStore,
@@ -87,7 +86,7 @@ class _Idle extends StatelessWidget {
           Expanded(
             child: CharactersList(
               characters: characters,
-              onFavoritesTap: charactersListStore.addToFavorites,
+              onFavoritesTap: charactersListStore.onFavoritesTap,
             ),
           ),
           Center(
@@ -103,7 +102,11 @@ class _Idle extends StatelessWidget {
 }
 
 class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar();
+  const _AppBar({
+    required this.charactersListStore,
+  });
+
+  final CharactersListStore charactersListStore;
 
   @override
   Widget build(BuildContext context) {
@@ -115,7 +118,11 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Theme.of(context).primaryColor,
       actions: [
         IconButton(
-          onPressed: () => context.push(favoritesPageRoute.path),
+          onPressed: () async {
+            charactersListStore.characters =
+                await context.push<List<Character>>(favoritesPageRoute.path) ??
+                    [];
+          },
           icon: const Icon(
             Icons.favorite,
             color: Colors.white,

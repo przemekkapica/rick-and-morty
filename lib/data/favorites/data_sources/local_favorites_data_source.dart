@@ -2,7 +2,6 @@ import 'package:injectable/injectable.dart';
 import 'package:isar/isar.dart';
 import 'package:rick_and_morty/data/database/local_database.dart';
 import 'package:rick_and_morty/data/favorites/data_sources/favorites_data_source.dart';
-import 'package:rick_and_morty/domain/characters/model/base_character.dart';
 import 'package:rick_and_morty/domain/favorites/model/favorite_character.f.dart';
 
 @LazySingleton(as: FavoritesDataSource)

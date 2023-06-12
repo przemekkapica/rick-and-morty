@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:injectable/injectable.dart';
 import 'package:mobx/mobx.dart';
@@ -6,25 +8,29 @@ import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_page.f.dart';
 import 'package:rick_and_morty/domain/characters/model/pagination_info.f.dart';
-import 'package:rick_and_morty/domain/favorites/model/favorite_character.f.dart';
 import 'package:rick_and_morty/domain/networking/model/connection_state.dart';
 import 'package:rick_and_morty/domain/use_cases/add_to_favorites.dart';
 import 'package:rick_and_morty/domain/use_cases/get_characters.dart';
 import 'package:rick_and_morty/domain/use_cases/get_connection_status.dart';
 import 'package:rick_and_morty/domain/use_cases/get_connection_status_stream.dart';
 import 'package:rick_and_morty/domain/use_cases/get_local_characters.dart';
+import 'package:rick_and_morty/domain/use_cases/is_favorite_character.dart';
 import 'package:rick_and_morty/domain/use_cases/remove_from_favorites.dart';
+import 'package:rick_and_morty/domain/use_cases/save_characters_to_database.dart';
+import 'package:rick_and_morty/domain/use_cases/update_local_character.dart';
 
 part 'characters_list_store.g.dart';
 
 enum CharactersListState { empty, loading, idle, error }
 
-final initialPagination = PaginationInfo(
+final _initialPagination = PaginationInfo(
   currentPage: 1,
   totalPages: 1,
   hasPrevious: false,
-  hasNext: true,
+  hasNext: false,
 );
+
+final _offlinePagination = _initialPagination;
 
 @injectable
 class CharactersListStore extends _CharactersListStore
@@ -34,6 +40,9 @@ class CharactersListStore extends _CharactersListStore
     super._addToFavorites,
     super._getLocalCharacters,
     super._removeFromFavorites,
+    super._saveCharactersToDatabase,
+    super._isFavoriteCharacter,
+    super._updateLocalCharacter,
     super._getConnectionStatus,
     super._getConnectionStatusStream,
   );
@@ -45,29 +54,41 @@ abstract class _CharactersListStore with Store {
     this._addToFavorites,
     this._removeFromFavorites,
     this._getLocalCharacters,
+    this._saveCharactersToDatabase,
+    this._isFavoriteCharacter,
+    this._updateLocalCharacter,
     this._getConnectionStatus,
     this._getConnectionStatusStream,
-  );
+  ) {
+    _connectionStatusSubscription =
+        _getConnectionStatusStream().listen(_onConnectionStatusChanged);
+  }
 
   final GetCharacters _getCharacters;
   final GetLocalCharacters _getLocalCharacters;
   final AddToFavorites _addToFavorites;
   final RemoveFromFavorites _removeFromFavorites;
+  final SaveCharactersToDatabase _saveCharactersToDatabase;
+  final IsFavoriteCharacter _isFavoriteCharacter;
+  final UpdateLocalCharacter _updateLocalCharacter;
+
   final GetConnectionStatus _getConnectionStatus;
   final GetConnectionStatusStream _getConnectionStatusStream;
+
+  late final StreamSubscription _connectionStatusSubscription;
 
   @observable
   List<Character> characters = [];
 
   @observable
-  PaginationInfo paginationInfo = initialPagination;
+  PaginationInfo paginationInfo = _initialPagination;
 
   @observable
   ObservableFuture<CharactersPage> _charactersPageFuture =
       ObservableFuture.value(
     CharactersPage(
       characters: [],
-      paginationInfo: initialPagination,
+      paginationInfo: _initialPagination,
     ),
   );
 
@@ -84,33 +105,46 @@ abstract class _CharactersListStore with Store {
     final connectionStatus = await _getConnectionStatus();
 
     if (connectionStatus.isConnected) {
-      try {
-        if (pageNumber != null) {
-          _asignCharactersPageFuture(pageNumber, filter);
-        } else {
-          _asignCharactersPageFuture(
-            paginationInfo.currentPage + (pageModifier ?? 0),
-            filter,
-          );
-        }
-        final response = await _charactersPageFuture;
-
-        paginationInfo = response.paginationInfo;
-        characters = response.characters;
-
-        _emitLoaded();
-      } on DioException catch (e) {
-        _handleDioException(e);
-      } catch (e) {
-        _state = CharactersListState.error;
-      }
+      await _fetchRemoteCharacters(pageNumber, filter, pageModifier);
     } else {
-      try {
-        characters = await _getLocalCharacters();
-        _emitLoaded();
-      } catch (e) {
-        _state = CharactersListState.error;
+      await _fetchLocalCharacters();
+    }
+  }
+
+  Future<void> _fetchLocalCharacters() async {
+    try {
+      characters = await _getLocalCharacters();
+      paginationInfo = _offlinePagination;
+
+      _emitLoaded();
+    } catch (e) {
+      _state = CharactersListState.error;
+    }
+  }
+
+  Future<void> _fetchRemoteCharacters(
+      int? pageNumber, CharactersFilter? filter, int? pageModifier) async {
+    try {
+      if (pageNumber != null) {
+        _asignCharactersPageFuture(pageNumber, filter);
+      } else {
+        _asignCharactersPageFuture(
+          paginationInfo.currentPage + (pageModifier ?? 0),
+          filter,
+        );
       }
+      final response = await _charactersPageFuture;
+
+      paginationInfo = response.paginationInfo;
+      characters = response.characters;
+
+      _emitLoaded();
+
+      await _saveCharactersToDatabase(characters);
+    } on DioException catch (e) {
+      _handleDioException(e);
+    } catch (e) {
+      _state = CharactersListState.error;
     }
   }
 
@@ -143,13 +177,19 @@ abstract class _CharactersListStore with Store {
     );
   }
 
-  @action
-  Future<void> addToFavorites(BaseCharacter character) async {
-    return await _addToFavorites(character);
-  }
+  void _onConnectionStatusChanged(ConnectionStatus status) {}
 
   @action
-  Future<void> removeFromFavorites(int id) async {
-    return await _removeFromFavorites(id);
+  Future<void> onFavoritesTap(BaseCharacter character) async {
+    final isFavorite = await _isFavoriteCharacter(character.id);
+    if (isFavorite) {
+      await _removeFromFavorites(character.id);
+    } else {
+      await _addToFavorites(character);
+    }
+    await _updateLocalCharacter(
+      Character.fromBaseCharacter(character, !isFavorite),
+    );
+    fetchCharacters(null, null, null);
   }
 }

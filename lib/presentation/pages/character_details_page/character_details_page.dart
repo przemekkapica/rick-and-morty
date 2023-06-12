@@ -2,9 +2,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:rick_and_morty/core/di/di_config.dart';
 import 'package:rick_and_morty/domain/characters/model/base_character.dart';
-import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/gender.dart';
 import 'package:rick_and_morty/domain/characters/model/status.dart';
 import 'package:rick_and_morty/presentation/extensions/string_extension.dart';
@@ -27,11 +27,17 @@ class _CharacterDetailsPageState extends State<CharacterDetailsPage> {
       getIt<CharacterDetailsStore>();
 
   @override
+  void didChangeDependencies() {
+    characterDetailsStore.init(widget.character.isFavorite);
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final BaseCharacter character = widget.character;
 
     return Scaffold(
-      appBar: const _AppBar(),
+      appBar: _AppBar(characterDetailsStore: characterDetailsStore),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Observer(
@@ -81,8 +87,8 @@ class _CharacterDetails extends StatelessWidget {
                   ),
                 ),
               ),
-              placeholder: (context, url) => CircularProgressIndicator(),
-              errorWidget: (context, url, error) => Icon(Icons.error),
+              placeholder: (context, url) => const CircularProgressIndicator(),
+              errorWidget: (context, url, error) => const Icon(Icons.error),
             ),
           ),
         ),
@@ -143,9 +149,16 @@ class _CharacterNameRow extends StatelessWidget {
           ),
         ),
         const Gap(8),
-        IconButton(
-          onPressed: () => characterDetailsStore.addToFavorites(character),
-          icon: const Icon(Icons.favorite_border_outlined, size: 30),
+        Observer(
+          builder: (context) => IconButton(
+            onPressed: () => characterDetailsStore.onFavoritesTap(character),
+            icon: Icon(
+              characterDetailsStore.isFavorite
+                  ? Icons.favorite
+                  : Icons.favorite_border_outlined,
+              size: 30,
+            ),
+          ),
         ),
       ],
     );
@@ -213,12 +226,23 @@ class _DataField extends StatelessWidget {
 }
 
 class _AppBar extends StatelessWidget implements PreferredSizeWidget {
-  const _AppBar();
+  const _AppBar({
+    required this.characterDetailsStore,
+  });
+
+  final CharacterDetailsStore characterDetailsStore;
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       iconTheme: const IconThemeData(color: Colors.white),
+      leading: IconButton(
+        icon: const Icon(Icons.chevron_left),
+        onPressed: () async {
+          final characters = characterDetailsStore.getCharactersOnPop();
+          context.pop(characters);
+        },
+      ),
       backgroundColor: Theme.of(context).primaryColor,
     );
   }

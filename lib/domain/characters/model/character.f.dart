@@ -29,6 +29,25 @@ class Character with _$Character implements BaseCharacter {
     required bool isFavorite,
   }) = _Character;
 
+  factory Character.fromBaseCharacter(
+    BaseCharacter character,
+    bool isFavorite,
+  ) {
+    return Character(
+      id: character.id,
+      name: character.name,
+      status: character.status,
+      image: character.image,
+      species: character.species,
+      type: character.type,
+      gender: character.gender,
+      origin: character.origin,
+      location: character.location,
+      created: character.created,
+      isFavorite: isFavorite,
+    );
+  }
+
   @override
   // ignore: recursive_getters
   Id get id => id;

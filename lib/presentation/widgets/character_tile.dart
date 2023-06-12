@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rick_and_morty/domain/characters/model/base_character.dart';
-import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/status.dart';
 import 'package:rick_and_morty/presentation/router/go_router.dart';
 
@@ -30,7 +29,11 @@ class CharacterTile extends StatelessWidget {
           const Gap(16),
           IconButton(
             onPressed: () => onFavoritesTap(character),
-            icon: const Icon(Icons.favorite_border_outlined),
+            icon: Icon(
+              character.isFavorite
+                  ? Icons.favorite
+                  : Icons.favorite_border_outlined,
+            ),
           ),
         ],
       ),
@@ -67,8 +70,8 @@ class _CharacterAvatar extends StatelessWidget {
             ),
           ),
         ),
-        placeholder: (context, url) => CircularProgressIndicator(),
-        errorWidget: (context, url, error) => Icon(Icons.error),
+        placeholder: (context, url) => const CircularProgressIndicator(),
+        errorWidget: (context, url, error) => const Icon(Icons.error),
       ),
     );
   }

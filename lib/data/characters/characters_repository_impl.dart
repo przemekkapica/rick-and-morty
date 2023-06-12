@@ -42,23 +42,58 @@ class CharactersRepositoryImpl implements CharactersRepository {
     );
 
     final paginationInfo = _paginationInfoMapper(response.info);
-    final characters = response.results
-        .map((characterDto) => _characterMapper(characterDto))
-        .toList();
+
+    final characters = response.results.map((characterDto) async {
+      final domainCharacter = _characterMapper(characterDto);
+
+      final isFavorite = await isFavoriteCharacter(domainCharacter.id);
+      return domainCharacter.copyWith(isFavorite: isFavorite);
+    }).toList();
+
+    final mappedCharacters = await Future.wait(characters);
 
     return CharactersPage(
-      characters: characters,
+      characters: mappedCharacters,
       paginationInfo: paginationInfo,
     );
   }
 
   @override
   Future<void> saveToDatabase(Character character) async {
-    return await _localDataSource.addCharacter(character);
+    final alreadyExists = await checkIfLocalCharacterExists(character.id);
+
+    if (!alreadyExists) {
+      return await _localDataSource.addCharacter(character);
+    }
   }
 
   @override
   Future<List<Character>> getLocalCharacters() async {
-    return await _localDataSource.getCharacters();
+    final result = await _localDataSource.getCharacters();
+
+    final characters = result.map((character) async {
+      final isFavorite = await isFavoriteCharacter(character.id);
+
+      return character.copyWith(isFavorite: isFavorite);
+    });
+
+    final mappedCharacters = await Future.wait(characters);
+
+    return mappedCharacters;
+  }
+
+  @override
+  Future<bool> checkIfLocalCharacterExists(int id) async {
+    return await _localDataSource.checkIfCharacterExists(id);
+  }
+
+  @override
+  Future<bool> isFavoriteCharacter(int id) async {
+    return await _localDataSource.isFavorite(id);
+  }
+
+  @override
+  Future<void> updateLocalCharacter(Character character) async {
+    return await _localDataSource.updateCharacter(character);
   }
 }

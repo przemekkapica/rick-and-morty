@@ -1,7 +1,6 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:isar/isar.dart';
 import 'package:rick_and_morty/domain/characters/model/base_character.dart';
-import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/gender.dart';
 import 'package:rick_and_morty/domain/characters/model/status.dart';
 
@@ -42,9 +41,10 @@ class FavoriteCharacter with _$FavoriteCharacter implements BaseCharacter {
       origin: character.origin,
       location: character.location,
       created: character.created,
-      isFavorite: character.isFavorite,
+      isFavorite: true,
     );
   }
+
   @override
   // ignore: recursive_getters
   Id get id => id;
