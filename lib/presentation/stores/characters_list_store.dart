@@ -27,13 +27,7 @@ part 'characters_list_store.g.dart';
 
 enum CharactersListState { empty, loading, idle, error }
 
-final _initialPagination = PaginationInfo(
-  currentPage: 1,
-  totalPages: 1,
-  hasPrevious: false,
-  hasNext: false,
-);
-
+final _initialPagination = PaginationInfo.initial();
 final _offlinePagination = _initialPagination;
 
 @injectable
@@ -214,7 +208,20 @@ abstract class _CharactersListStore with Store {
     await _updateLocalCharacter(
       Character.fromBaseCharacter(character, !isFavorite),
     );
-    _fetchCharactersWithLatestFiltersAndPagination();
+
+    _updateCharactersList(character, isFavorite);
+  }
+
+  void _updateCharactersList(BaseCharacter character, bool isFavorite) {
+    final updatedCharacter =
+        Character.fromBaseCharacter(character, !isFavorite);
+
+    var charactersList = List<Character>.from(characters);
+
+    charactersList[characters.indexWhere((c) => c.id == character.id)] =
+        updatedCharacter;
+
+    characters = List.of(charactersList);
   }
 
   void _fetchCharactersWithLatestFiltersAndPagination() {

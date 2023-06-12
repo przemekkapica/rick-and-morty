@@ -69,7 +69,11 @@ abstract class _FavoritesStore with Store {
   Future<void> removeFromFavorites(BaseCharacter character) async {
     try {
       await _removeFromFavorites(character.id);
-      favorites = await _getFavorites();
+
+      final favoritesCopy = List<FavoriteCharacter>.from(favorites);
+      favoritesCopy.remove(character);
+
+      favorites = List.of(favoritesCopy);
       _emitLoaded();
     } catch (e) {
       _state = FavoritesState.error;

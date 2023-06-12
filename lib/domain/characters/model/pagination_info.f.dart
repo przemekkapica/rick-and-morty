@@ -10,4 +10,13 @@ class PaginationInfo with _$PaginationInfo {
     required bool hasPrevious,
     required bool hasNext,
   }) = _PaginationInfo;
+
+  factory PaginationInfo.initial() {
+    return PaginationInfo(
+      currentPage: 1,
+      totalPages: 1,
+      hasPrevious: false,
+      hasNext: false,
+    );
+  }
 }
