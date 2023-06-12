@@ -13,11 +13,15 @@ import 'package:rick_and_morty/domain/use_cases/add_to_favorites.dart';
 import 'package:rick_and_morty/domain/use_cases/get_characters.dart';
 import 'package:rick_and_morty/domain/use_cases/get_connection_status.dart';
 import 'package:rick_and_morty/domain/use_cases/get_connection_status_stream.dart';
+import 'package:rick_and_morty/domain/use_cases/get_latest_characters_filter.dart';
+import 'package:rick_and_morty/domain/use_cases/get_latest_pagination_info.dart';
 import 'package:rick_and_morty/domain/use_cases/get_local_characters.dart';
 import 'package:rick_and_morty/domain/use_cases/is_favorite_character.dart';
 import 'package:rick_and_morty/domain/use_cases/remove_from_favorites.dart';
 import 'package:rick_and_morty/domain/use_cases/save_characters_to_database.dart';
+import 'package:rick_and_morty/domain/use_cases/update_characters_filter.dart';
 import 'package:rick_and_morty/domain/use_cases/update_local_character.dart';
+import 'package:rick_and_morty/domain/use_cases/update_pagination_info.dart';
 
 part 'characters_list_store.g.dart';
 
@@ -43,6 +47,10 @@ class CharactersListStore extends _CharactersListStore
     super._saveCharactersToDatabase,
     super._isFavoriteCharacter,
     super._updateLocalCharacter,
+    super._updateCharactersFilter,
+    super._updatePaginationInfo,
+    super._getLatestCharactersFilter,
+    super._getLatestPaginationInfo,
     super._getConnectionStatus,
     super._getConnectionStatusStream,
   );
@@ -57,6 +65,10 @@ abstract class _CharactersListStore with Store {
     this._saveCharactersToDatabase,
     this._isFavoriteCharacter,
     this._updateLocalCharacter,
+    this._updatePaginationInfo,
+    this._updateCharactersFilter,
+    this._getLatestCharactersFilter,
+    this._getLatestPaginationInfo,
     this._getConnectionStatus,
     this._getConnectionStatusStream,
   ) {
@@ -71,7 +83,10 @@ abstract class _CharactersListStore with Store {
   final SaveCharactersToDatabase _saveCharactersToDatabase;
   final IsFavoriteCharacter _isFavoriteCharacter;
   final UpdateLocalCharacter _updateLocalCharacter;
-
+  final UpdatePaginationInfo _updatePaginationInfo;
+  final UpdateCharactersFilter _updateCharactersFilter;
+  final GetLatestCharactersFilter _getLatestCharactersFilter;
+  final GetLatestPaginationInfo _getLatestPaginationInfo;
   final GetConnectionStatus _getConnectionStatus;
   final GetConnectionStatusStream _getConnectionStatusStream;
 
@@ -95,16 +110,16 @@ abstract class _CharactersListStore with Store {
   @readonly
   CharactersListState _state = CharactersListState.loading;
 
-  CharactersFilter? _lastFilter;
-
   @action
   Future<void> fetchCharacters(
     int? pageNumber,
     int? pageModifier,
     CharactersFilter? filter,
   ) async {
-    _lastFilter = filter;
     _state = CharactersListState.loading;
+    if (filter != null) {
+      _updateCharactersFilter(filter);
+    }
     final connectionStatus = await _getConnectionStatus();
 
     if (connectionStatus.isConnected) {
@@ -142,6 +157,7 @@ abstract class _CharactersListStore with Store {
       final response = await _charactersPageFuture;
 
       paginationInfo = response.paginationInfo;
+      _updatePaginationInfo(paginationInfo);
       characters = response.characters;
 
       _emitLoaded();
@@ -184,7 +200,7 @@ abstract class _CharactersListStore with Store {
   }
 
   void _onConnectionStatusChanged(ConnectionStatus status) {
-    fetchCharacters(paginationInfo.currentPage, null, _lastFilter);
+    _fetchCharactersWithLatestFiltersAndPagination();
   }
 
   @action
@@ -198,7 +214,15 @@ abstract class _CharactersListStore with Store {
     await _updateLocalCharacter(
       Character.fromBaseCharacter(character, !isFavorite),
     );
-    fetchCharacters(paginationInfo.currentPage, null, _lastFilter);
+    _fetchCharactersWithLatestFiltersAndPagination();
+  }
+
+  void _fetchCharactersWithLatestFiltersAndPagination() {
+    fetchCharacters(
+      _getLatestPaginationInfo().currentPage,
+      null,
+      _getLatestCharactersFilter(),
+    );
   }
 
   void dispose() {

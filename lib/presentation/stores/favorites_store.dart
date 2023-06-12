@@ -7,6 +7,8 @@ import 'package:rick_and_morty/domain/networking/model/connection_state.dart';
 import 'package:rick_and_morty/domain/use_cases/get_characters.dart';
 import 'package:rick_and_morty/domain/use_cases/get_connection_status.dart';
 import 'package:rick_and_morty/domain/use_cases/get_favorites.dart';
+import 'package:rick_and_morty/domain/use_cases/get_latest_characters_filter.dart';
+import 'package:rick_and_morty/domain/use_cases/get_latest_pagination_info.dart';
 import 'package:rick_and_morty/domain/use_cases/get_local_characters.dart';
 import 'package:rick_and_morty/domain/use_cases/remove_from_favorites.dart';
 
@@ -22,6 +24,8 @@ class FavoritesStore extends _FavoritesStore with _$FavoritesStore {
     super._getLocalCharacters,
     super._getCharacters,
     super._getConnectionStatus,
+    super._getLatestCharactersFilter,
+    super._getLatestPaginationInfo,
   );
 }
 
@@ -32,6 +36,8 @@ abstract class _FavoritesStore with Store {
     this._getLocalCharacters,
     this._getCharacters,
     this._getConnectionStatus,
+    this._getLatestCharactersFilter,
+    this._getLatestPaginationInfo,
   );
 
   final GetFavorites _getFavorites;
@@ -39,6 +45,8 @@ abstract class _FavoritesStore with Store {
   final GetLocalCharacters _getLocalCharacters;
   final RemoveFromFavorites _removeFromFavorites;
   final GetConnectionStatus _getConnectionStatus;
+  final GetLatestCharactersFilter _getLatestCharactersFilter;
+  final GetLatestPaginationInfo _getLatestPaginationInfo;
 
   @readonly
   FavoritesState _state = FavoritesState.loading;
@@ -81,7 +89,10 @@ abstract class _FavoritesStore with Store {
     try {
       final status = await _getConnectionStatus();
       if (status.isConnected) {
-        final result = await _getCharacters(null, null);
+        final result = await _getCharacters(
+          _getLatestPaginationInfo().currentPage,
+          _getLatestCharactersFilter(),
+        );
         return result.characters;
       } else {
         return await _getLocalCharacters();

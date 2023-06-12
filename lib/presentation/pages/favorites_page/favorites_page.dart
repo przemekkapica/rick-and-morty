@@ -7,7 +7,9 @@ import 'package:rick_and_morty/presentation/stores/favorites_store.dart';
 import 'package:rick_and_morty/presentation/widgets/characters_list.dart';
 
 class FavoritesPage extends StatefulWidget {
-  const FavoritesPage({super.key});
+  const FavoritesPage({
+    super.key,
+  });
 
   @override
   State<FavoritesPage> createState() => _FavoritesPageState();
@@ -15,6 +17,11 @@ class FavoritesPage extends StatefulWidget {
 
 class _FavoritesPageState extends State<FavoritesPage> {
   final FavoritesStore favoritesStore = getIt<FavoritesStore>();
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
