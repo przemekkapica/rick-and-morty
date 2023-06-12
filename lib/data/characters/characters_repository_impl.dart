@@ -9,6 +9,8 @@ import 'package:rick_and_morty/domain/characters/characters_repository.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_page.f.dart';
+import 'package:rick_and_morty/domain/characters/model/gender.dart';
+import 'package:rick_and_morty/domain/characters/model/status.dart';
 
 @LazySingleton(as: CharactersRepository)
 class CharactersRepositoryImpl implements CharactersRepository {
@@ -68,9 +70,8 @@ class CharactersRepositoryImpl implements CharactersRepository {
   }
 
   @override
-  Future<List<Character>> getLocalCharacters() async {
-    final result = await _localDataSource.getCharacters();
-
+  Future<List<Character>> getLocalCharacters(CharactersFilter filter) async {
+    final result = await _localDataSource.getCharacters(filter);
     final characters = result.map((character) async {
       final isFavorite = await isFavoriteCharacter(character.id);
 

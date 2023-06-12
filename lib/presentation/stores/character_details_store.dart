@@ -81,13 +81,14 @@ abstract class _CharacterDetailsStore with Store {
 
   @action
   Future<List<Character>> getCharactersOnPop() async {
+    // TODO: feed with latest pagination and filters
     try {
       final status = await _getConnectionStatus();
       if (status.isConnected) {
         final result = await _getCharacters(null, null);
         return result.characters;
       } else {
-        return await _getLocalCharacters();
+        return await _getLocalCharacters(null);
       }
     } catch (e) {
       _state = CharacterDetailsState.error;

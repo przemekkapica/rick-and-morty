@@ -99,7 +99,7 @@ abstract class _FavoritesStore with Store {
         );
         return result.characters;
       } else {
-        return await _getLocalCharacters();
+        return await _getLocalCharacters(_getLatestCharactersFilter());
       }
     } catch (e) {
       _state = FavoritesState.error;

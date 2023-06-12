@@ -119,13 +119,13 @@ abstract class _CharactersListStore with Store {
     if (connectionStatus.isConnected) {
       await _fetchRemoteCharacters(pageNumber, filter, pageModifier);
     } else {
-      await _fetchLocalCharacters();
+      await _fetchLocalCharacters(filter);
     }
   }
 
-  Future<void> _fetchLocalCharacters() async {
+  Future<void> _fetchLocalCharacters(CharactersFilter? filter) async {
     try {
-      characters = await _getLocalCharacters();
+      characters = await _getLocalCharacters(filter);
       paginationInfo = _offlinePagination;
 
       _emitLoaded();

@@ -9,7 +9,7 @@ abstract class CharactersRepository {
 
   Future<bool> isFavoriteCharacter(int id);
 
-  Future<List<Character>> getLocalCharacters();
+  Future<List<Character>> getLocalCharacters(CharactersFilter filter);
 
   Future<void> saveToDatabase(Character character);
 
