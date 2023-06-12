@@ -32,25 +32,32 @@ class _FavoritesPageState extends State<FavoritesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: _AppBar(favoritesStore: favoritesStore),
-      body: Center(
-        child: Observer(
-          builder: (context) {
-            switch (favoritesStore.state) {
-              case FavoritesState.loading:
-                return const CircularProgressIndicator();
-              case FavoritesState.empty:
-                return const Text('Your favorites list is empty');
-              case FavoritesState.idle:
-                return _Idle(
-                  favorites: favoritesStore.favorites,
-                  favoritesStore: favoritesStore,
-                );
-              case FavoritesState.error:
-                return const Text('Something went wrong');
-            }
-          },
+    return WillPopScope(
+      onWillPop: () {
+        final charactersPage = favoritesStore.getCharactersOnPop();
+        context.pop(charactersPage);
+        return Future.value(true);
+      },
+      child: Scaffold(
+        appBar: _AppBar(favoritesStore: favoritesStore),
+        body: Center(
+          child: Observer(
+            builder: (context) {
+              switch (favoritesStore.state) {
+                case FavoritesState.loading:
+                  return const CircularProgressIndicator();
+                case FavoritesState.empty:
+                  return const Text('Your favorites list is empty');
+                case FavoritesState.idle:
+                  return _Idle(
+                    favorites: favoritesStore.favorites,
+                    favoritesStore: favoritesStore,
+                  );
+                case FavoritesState.error:
+                  return const Text('Something went wrong');
+              }
+            },
+          ),
         ),
       ),
     );
@@ -90,7 +97,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       iconTheme: const IconThemeData(color: Colors.white),
       title: Text(
-        'Favorites',
+        'Favorite characters',
         style: Theme.of(context)
             .textTheme
             .titleMedium

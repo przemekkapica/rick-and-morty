@@ -42,7 +42,7 @@ class FilterCharactersBottomSheet extends StatelessWidget {
                 style: Theme.of(context)
                     .textTheme
                     .titleLarge
-                    ?.copyWith(fontWeight: FontWeight.bold),
+                    ?.copyWith(fontWeight: FontWeight.w500),
               ),
               const Gap(16),
               TextFormField(
@@ -63,51 +63,19 @@ class FilterCharactersBottomSheet extends StatelessWidget {
                 onChanged: (value) => filterCharactersStore.setSpecies(value),
               ),
               const Gap(24),
-              Text(
-                'Status',
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: Colors.grey),
-              ),
-              GroupButton<Status>(
-                controller: statusController,
-                enableDeselect: true,
-                onSelected: (status, index, selected) =>
-                    filterCharactersStore.setStatus(status, selected),
-                buttons: Status.values,
-                buttonTextBuilder: (selected, value, context) => value.value,
+              _CharacterStatusSection(
+                statusController: statusController,
+                filterCharactersStore: filterCharactersStore,
               ),
               const Gap(16),
-              Text(
-                'Gender',
-                style: Theme.of(context)
-                    .textTheme
-                    .labelMedium
-                    ?.copyWith(color: Colors.grey),
+              _CharacterGenderSection(
+                genderController: genderController,
+                filterCharactersStore: filterCharactersStore,
               ),
-              GroupButton<Gender>(
-                controller: genderController,
-                enableDeselect: true,
-                onSelected: (gender, index, selected) =>
-                    filterCharactersStore.setGender(gender, selected),
-                buttons: Gender.values,
-                buttonTextBuilder: (selected, value, context) => value.value,
-              ),
-              const Gap(16),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  child: const Text('Filter'),
-                  onPressed: () {
-                    charactersListStore.fetchCharacters(
-                      1,
-                      null,
-                      filterCharactersStore.filter,
-                    );
-                    Navigator.of(context).pop();
-                  },
-                ),
+              const Gap(24),
+              _SubmitFiltersButton(
+                charactersListStore: charactersListStore,
+                filterCharactersStore: filterCharactersStore,
               )
             ],
           ),
@@ -126,5 +94,115 @@ class FilterCharactersBottomSheet extends StatelessWidget {
       statusController
           .selectIndex(Status.values.indexOf(filterCharactersStore.status!));
     }
+  }
+}
+
+class _CharacterGenderSection extends StatelessWidget {
+  const _CharacterGenderSection({
+    required this.genderController,
+    required this.filterCharactersStore,
+  });
+
+  final GroupButtonController genderController;
+  final FilterCharactersStore filterCharactersStore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Gender',
+          style: Theme.of(context)
+              .textTheme
+              .labelMedium
+              ?.copyWith(color: Colors.grey),
+        ),
+        GroupButton<Gender>(
+          controller: genderController,
+          options: const GroupButtonOptions(
+            mainGroupAlignment: MainGroupAlignment.start,
+          ),
+          enableDeselect: true,
+          onSelected: (gender, index, selected) =>
+              filterCharactersStore.setGender(gender, selected),
+          buttons: Gender.values,
+          buttonTextBuilder: (selected, value, context) => value.value,
+        ),
+      ],
+    );
+  }
+}
+
+class _CharacterStatusSection extends StatelessWidget {
+  const _CharacterStatusSection({
+    required this.statusController,
+    required this.filterCharactersStore,
+  });
+
+  final GroupButtonController statusController;
+  final FilterCharactersStore filterCharactersStore;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Status',
+          style: Theme.of(context)
+              .textTheme
+              .labelMedium
+              ?.copyWith(color: Colors.grey),
+        ),
+        GroupButton<Status>(
+          controller: statusController,
+          enableDeselect: true,
+          onSelected: (status, index, selected) =>
+              filterCharactersStore.setStatus(status, selected),
+          buttons: Status.values,
+          buttonTextBuilder: (selected, value, context) => value.value,
+        ),
+      ],
+    );
+  }
+}
+
+class _SubmitFiltersButton extends StatelessWidget {
+  const _SubmitFiltersButton({
+    required this.charactersListStore,
+    required this.filterCharactersStore,
+  });
+
+  final CharactersListStore charactersListStore;
+  final FilterCharactersStore filterCharactersStore;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            backgroundColor: Theme.of(context).primaryColor),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12.0),
+          child: Text(
+            'Filter',
+            style: Theme.of(context)
+                .textTheme
+                .bodyLarge
+                ?.copyWith(color: Colors.white),
+          ),
+        ),
+        onPressed: () {
+          charactersListStore.fetchCharacters(
+            1,
+            null,
+            filterCharactersStore.filter,
+          );
+          Navigator.of(context).pop();
+        },
+      ),
+    );
   }
 }

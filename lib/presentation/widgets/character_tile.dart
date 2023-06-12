@@ -33,6 +33,7 @@ class CharacterTile extends StatelessWidget {
               character.isFavorite
                   ? Icons.favorite
                   : Icons.favorite_border_outlined,
+              color: Theme.of(context).primaryColor,
             ),
           ),
         ],
@@ -106,12 +107,56 @@ class _CharacterInfo extends StatelessWidget {
             softWrap: true,
           ),
           const Gap(4),
-          Text(
-            'Status: ${character.status.value}',
+          _CharacterStatusInfo(character: character),
+          _CharacterSpeciesInfo(character: character),
+        ],
+      ),
+    );
+  }
+}
+
+class _CharacterSpeciesInfo extends StatelessWidget {
+  const _CharacterSpeciesInfo({
+    required this.character,
+  });
+
+  final BaseCharacter character;
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        text: 'Species: ',
+        style:
+            Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+        children: [
+          TextSpan(
+            text: character.species,
             style: Theme.of(context).textTheme.bodySmall,
           ),
-          Text(
-            'Species: ${character.species}',
+        ],
+      ),
+    );
+  }
+}
+
+class _CharacterStatusInfo extends StatelessWidget {
+  const _CharacterStatusInfo({
+    required this.character,
+  });
+
+  final BaseCharacter character;
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        text: 'Status: ',
+        style:
+            Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+        children: [
+          TextSpan(
+            text: character.status.value,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],

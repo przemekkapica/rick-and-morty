@@ -158,17 +158,18 @@ class _CharacterNameRow extends StatelessWidget {
           ),
         ),
         const Gap(8),
-        Observer(
-          builder: (context) => IconButton(
-            onPressed: () => characterDetailsStore.onFavoritesTap(character),
-            icon: Icon(
-              characterDetailsStore.isFavorite
-                  ? Icons.favorite
-                  : Icons.favorite_border_outlined,
-              size: 30,
-            ),
-          ),
-        ),
+        // TODO: temporary disabled
+        // Observer(
+        //   builder: (context) => IconButton(
+        //     onPressed: () => characterDetailsStore.onFavoritesTap(character),
+        //     icon: Icon(
+        //       characterDetailsStore.isFavorite
+        //           ? Icons.favorite
+        //           : Icons.favorite_border_outlined,
+        //       size: 30,
+        //     ),
+        //   ),
+        // ),
       ],
     );
   }
