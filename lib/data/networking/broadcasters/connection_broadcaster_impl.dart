@@ -15,5 +15,5 @@ class ConnectionBroadcasterImpl implements ConnectionBroadcaster {
 
   @override
   Stream<ConnectionStatus> get stream =>
-      _connectionInspector.connectionStatusStream.asBroadcastStream();
+      _connectionInspector.connectionStatusStream;
 }

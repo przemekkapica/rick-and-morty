@@ -71,7 +71,16 @@ class _CharacterAvatar extends StatelessWidget {
           ),
         ),
         placeholder: (context, url) => const CircularProgressIndicator(),
-        errorWidget: (context, url, error) => const Icon(Icons.error),
+        errorWidget: (context, url, error) => const SizedBox(
+          width: 64,
+          height: 64,
+          child: Center(
+            child: Icon(
+              Icons.error,
+              size: 30,
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -89,6 +89,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
             .titleMedium
             ?.copyWith(color: Colors.white, fontWeight: FontWeight.bold),
       ),
+      centerTitle: true,
       leading: IconButton(
         icon: const Icon(Icons.chevron_left),
         onPressed: () async {

@@ -16,6 +16,7 @@ class CharactersList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
+      physics: const BouncingScrollPhysics(),
       itemBuilder: (BuildContext context, int index) {
         return CharacterTile(
           onFavoritesTap: onFavoritesTap,

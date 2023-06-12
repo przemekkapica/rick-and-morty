@@ -1,6 +1,5 @@
 import 'package:go_router/go_router.dart';
 import 'package:rick_and_morty/domain/characters/model/base_character.dart';
-import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/presentation/pages/character_details_page/character_details_page.dart';
 import 'package:rick_and_morty/presentation/pages/characters_list_page/characters_list_page.dart';
 import 'package:rick_and_morty/presentation/pages/favorites_page/favorites_page.dart';

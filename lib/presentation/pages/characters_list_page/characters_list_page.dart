@@ -35,6 +35,12 @@ class _CharactersListPageState extends State<CharactersListPage> {
   }
 
   @override
+  void dispose() {
+    charactersListStore.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _AppBar(charactersListStore: charactersListStore),
@@ -115,6 +121,7 @@ class _AppBar extends StatelessWidget implements PreferredSizeWidget {
         'assets/images/rick_and_morty_logo.png',
         height: 80,
       ),
+      centerTitle: true,
       backgroundColor: Theme.of(context).primaryColor,
       actions: [
         IconButton(

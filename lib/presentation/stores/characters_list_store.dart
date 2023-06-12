@@ -95,12 +95,15 @@ abstract class _CharactersListStore with Store {
   @readonly
   CharactersListState _state = CharactersListState.loading;
 
+  CharactersFilter? _lastFilter;
+
   @action
   Future<void> fetchCharacters(
     int? pageNumber,
     int? pageModifier,
     CharactersFilter? filter,
   ) async {
+    _lastFilter = filter;
     _state = CharactersListState.loading;
     final connectionStatus = await _getConnectionStatus();
 
@@ -123,7 +126,10 @@ abstract class _CharactersListStore with Store {
   }
 
   Future<void> _fetchRemoteCharacters(
-      int? pageNumber, CharactersFilter? filter, int? pageModifier) async {
+    int? pageNumber,
+    CharactersFilter? filter,
+    int? pageModifier,
+  ) async {
     try {
       if (pageNumber != null) {
         _asignCharactersPageFuture(pageNumber, filter);
@@ -177,7 +183,9 @@ abstract class _CharactersListStore with Store {
     );
   }
 
-  void _onConnectionStatusChanged(ConnectionStatus status) {}
+  void _onConnectionStatusChanged(ConnectionStatus status) {
+    fetchCharacters(paginationInfo.currentPage, null, _lastFilter);
+  }
 
   @action
   Future<void> onFavoritesTap(BaseCharacter character) async {
@@ -190,6 +198,10 @@ abstract class _CharactersListStore with Store {
     await _updateLocalCharacter(
       Character.fromBaseCharacter(character, !isFavorite),
     );
-    fetchCharacters(null, null, null);
+    fetchCharacters(paginationInfo.currentPage, null, _lastFilter);
+  }
+
+  void dispose() {
+    _connectionStatusSubscription.cancel();
   }
 }

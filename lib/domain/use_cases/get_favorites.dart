@@ -1,5 +1,4 @@
 import 'package:injectable/injectable.dart';
-import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/favorites/favorites_repository.dart';
 import 'package:rick_and_morty/domain/favorites/model/favorite_character.f.dart';
 

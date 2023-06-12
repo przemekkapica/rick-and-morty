@@ -88,7 +88,16 @@ class _CharacterDetails extends StatelessWidget {
                 ),
               ),
               placeholder: (context, url) => const CircularProgressIndicator(),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
+              errorWidget: (context, url, error) => const SizedBox(
+                width: 260,
+                height: 260,
+                child: Center(
+                  child: Icon(
+                    Icons.error,
+                    size: 60,
+                  ),
+                ),
+              ),
             ),
           ),
         ),

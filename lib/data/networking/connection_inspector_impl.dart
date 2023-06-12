@@ -10,7 +10,7 @@ class ConnectionInspectorImpl implements ConnectionInspector {
 
   final ConnectionChecker _connectionChecker;
 
-  bool _checkingEnabled = false;
+  bool _checkingEnabled = true;
 
   @override
   late final Stream<ConnectionStatus> connectionStatusStream =
@@ -18,14 +18,11 @@ class ConnectionInspectorImpl implements ConnectionInspector {
 
   Stream<ConnectionStatus> get _onConnectionStatusChanged {
     return _connectionChecker.connectionStream
-        .where((_) => _checkingEnabled)
         .flatMap<ConnectionStatus>((isConnected) async* {
-          final state = await getConnectionStatus();
-
-          if (state.isConnected) {
-            yield ConnectionStatus.connected;
-          } else {
+          if (!isConnected) {
             yield ConnectionStatus.disconnected;
+          } else {
+            yield ConnectionStatus.connected;
           }
         })
         .distinct()

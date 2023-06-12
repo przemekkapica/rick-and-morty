@@ -17,6 +17,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _appStore.startCheckingConnection();
   }
 
   @override
