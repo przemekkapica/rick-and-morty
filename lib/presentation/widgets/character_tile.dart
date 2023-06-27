@@ -28,6 +28,7 @@ class CharacterTile extends StatelessWidget {
           _CharacterInfo(character: character),
           const Gap(16),
           IconButton(
+            key: ValueKey(character.id),
             onPressed: () => onFavoritesTap(character),
             icon: Icon(
               character.isFavorite

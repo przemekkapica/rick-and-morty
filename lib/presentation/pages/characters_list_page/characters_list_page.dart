@@ -55,9 +55,15 @@ class _CharactersListPageState extends State<CharactersListPage> {
               case CharactersListState.empty:
                 return const Text('No characters were found');
               case CharactersListState.loading:
-                return const CircularProgressIndicator();
+                return _IdleOrLoading(
+                  state: CharactersListState.loading,
+                  charactersListStore: charactersListStore,
+                  filterCharactersStore: filterCharactersStore,
+                  characters: charactersListStore.characters,
+                );
               case CharactersListState.idle:
-                return _Idle(
+                return _IdleOrLoading(
+                  state: CharactersListState.idle,
                   charactersListStore: charactersListStore,
                   filterCharactersStore: filterCharactersStore,
                   characters: charactersListStore.characters,
@@ -72,30 +78,42 @@ class _CharactersListPageState extends State<CharactersListPage> {
   }
 }
 
-class _Idle extends StatelessWidget {
-  const _Idle({
+class _IdleOrLoading extends StatelessWidget {
+  const _IdleOrLoading({
+    required this.state,
     required this.charactersListStore,
     required this.filterCharactersStore,
     required this.characters,
   });
 
+  final CharactersListState state;
   final CharactersListStore charactersListStore;
   final FilterCharactersStore filterCharactersStore;
   final List<Character> characters;
 
   @override
   Widget build(BuildContext context) {
+    final loadingContent = [
+      const Spacer(),
+      const CircularProgressIndicator(),
+      const Spacer(),
+    ];
+
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          Expanded(
-            child: CharactersList(
-              characters: characters,
-              onFavoritesTap: charactersListStore.onFavoritesTap,
+          if (state == CharactersListState.loading)
+            ...loadingContent
+          else
+            Expanded(
+              child: CharactersList(
+                characters: characters,
+                onFavoritesTap: charactersListStore.onFavoritesTap,
+              ),
             ),
-          ),
-          Center(
+          Align(
+            alignment: Alignment.bottomCenter,
             child: Paginator(
               charactersListStore: charactersListStore,
               filterCharactersStore: filterCharactersStore,
