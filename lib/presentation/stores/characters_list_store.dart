@@ -8,6 +8,7 @@ import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_page.f.dart';
 import 'package:rick_and_morty/domain/characters/model/pagination_info.f.dart';
+import 'package:rick_and_morty/domain/networking/error/network_exception.dart';
 import 'package:rick_and_morty/domain/networking/model/connection_state.dart';
 import 'package:rick_and_morty/domain/use_cases/add_to_favorites.dart';
 import 'package:rick_and_morty/domain/use_cases/get_characters.dart';
@@ -157,8 +158,8 @@ abstract class _CharactersListStore with Store {
       _emitLoaded();
 
       await _saveCharactersToDatabase(characters);
-    } on DioException catch (e) {
-      _handleDioException(e);
+    } on NotFoundException {
+      _state = _state = CharactersListState.empty;
     } catch (e) {
       _state = CharactersListState.error;
     }
@@ -169,18 +170,6 @@ abstract class _CharactersListStore with Store {
       _state = CharactersListState.empty;
     } else {
       _state = CharactersListState.idle;
-    }
-  }
-
-  void _handleDioException(DioException e) {
-    if (e.response != null) {
-      if (e.response!.statusCode != null && e.response!.statusCode! == 404) {
-        _state = CharactersListState.empty;
-      } else {
-        _state = CharactersListState.error;
-      }
-    } else {
-      _state = CharactersListState.error;
     }
   }
 

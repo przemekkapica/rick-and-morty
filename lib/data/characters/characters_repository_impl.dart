@@ -5,6 +5,7 @@ import 'package:rick_and_morty/data/characters/mappers/character_mapper.dart';
 import 'package:rick_and_morty/data/characters/mappers/gender_mapper.dart';
 import 'package:rick_and_morty/data/characters/mappers/pagination_info_mapper.dart';
 import 'package:rick_and_morty/data/characters/mappers/status_mapper.dart';
+import 'package:rick_and_morty/data/networking/error/handle_network_error.dart';
 import 'package:rick_and_morty/domain/characters/characters_repository.dart';
 import 'package:rick_and_morty/domain/characters/model/character.f.dart';
 import 'package:rick_and_morty/domain/characters/model/characters_filter.f.dart';
@@ -19,6 +20,7 @@ class CharactersRepositoryImpl implements CharactersRepository {
     this._statusMapper,
     this._genderMapper,
     this._paginationInfoMapper,
+    this._handleNetworkError,
   );
 
   final RemoteCharactersDataSource _remoteDataSource;
@@ -27,19 +29,22 @@ class CharactersRepositoryImpl implements CharactersRepository {
   final StatusMapper _statusMapper;
   final GenderMapper _genderMapper;
   final PaginationInfoMapper _paginationInfoMapper;
+  final HandleNetworkError _handleNetworkError;
 
   @override
   Future<CharactersPage> getCharacters(
     int? page,
     CharactersFilter filter,
   ) async {
-    final response = await _remoteDataSource.getCharacters(
-      page,
-      filter.name,
-      filter.status != null ? _statusMapper.toDTO(filter.status!) : null,
-      filter.species,
-      filter.gender != null ? _genderMapper.toDTO(filter.gender!) : null,
-    );
+    final response = await _handleNetworkError(() {
+      return _remoteDataSource.getCharacters(
+        page,
+        filter.name,
+        filter.status != null ? _statusMapper.toDTO(filter.status!) : null,
+        filter.species,
+        filter.gender != null ? _genderMapper.toDTO(filter.gender!) : null,
+      );
+    });
 
     final paginationInfo = _paginationInfoMapper(response.info);
 
